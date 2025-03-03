@@ -11,5 +11,7 @@ app.get('/', (req, res) => {
 })
 
 app.listen(process.env.PORT, () => {
-  console.log(`listening on http://localhost:${process.env.PORT}/`)
+  console.log(`server ready on port ${process.env.PORT}`)
 })
+
+export default app
