@@ -3,22 +3,50 @@ import type { NextFunction, Request, Response } from 'express'
 
 import { HandlerError } from './errors'
 
-class Handler<T = unknown> {
-  #schema?: z.Schema<T>
+class Handler<
+  Values,
+  InputParams extends string[] | null,
+  OutputParams extends { [key: string]: string } | null,
+> {
+  #schema?: z.Schema<Values>
+  #params = null as InputParams
 
-  private async handleCallback({
+  private validateParams<T extends InputParams>(
+    params: T,
+    req: Request,
+    res: Response,
+  ) {
+    if (!params) {
+      return null
+    }
+
+    const schema = z.object(
+      Object.fromEntries(params.map((params) => [params, z.string()])),
+    )
+    const result = schema.safeParse(req.params)
+
+    if (!result.success) {
+      return res.status(400).json(result.error.format())
+    }
+
+    return result.data
+  }
+
+  private async builder({
     callback,
     ...args
   }: {
     req: Request
+    params: OutputParams
     res: Response
     next: NextFunction
-    values: T
+    values: Values
     callback: (args: {
       req: Request
+      params: OutputParams
       res: Response
       next: NextFunction
-      values: T
+      values: Values
     }) => Promise<void>
   }) {
     try {
@@ -33,21 +61,30 @@ class Handler<T = unknown> {
     }
   }
 
-  schema<U extends T>(schema: z.Schema<U>) {
+  params<T extends NonNullable<InputParams>>(params: T) {
+    this.#params = params
+    return this as unknown as Handler<
+      Values,
+      typeof params,
+      { [K in T[number]]: string }
+    >
+  }
+
+  schema<T extends Values>(schema: z.Schema<T>) {
     this.#schema = schema
-    return this as unknown as Handler<z.infer<typeof schema>>
+    return this as unknown as Handler<
+      z.infer<typeof schema>,
+      InputParams,
+      OutputParams
+    >
   }
 
   action(
-    callback: ({
-      values,
-      req,
-      res,
-      next,
-    }: {
-      values: T
+    callback: (args: {
       req: Request
+      params: OutputParams
       res: Response
+      values: Values
       next: NextFunction
     }) => Promise<void>,
   ) {
@@ -62,23 +99,34 @@ class Handler<T = unknown> {
         return res.status(400).json(result.error.format())
       }
 
-      this.handleCallback({ req, res, next, values: result.data, callback })
+      this.builder({
+        req,
+        params: this.validateParams(this.#params, req, res),
+        res,
+        next,
+        values: result.data,
+        callback,
+      })
     }
   }
 
   query(
-    callback: ({
-      req,
-      res,
-      next,
-    }: {
+    callback: (args: {
       req: Request
+      params: OutputParams
       res: Response
       next: NextFunction
     }) => Promise<void>,
   ) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      this.handleCallback({ req, res, next, values: {} as T, callback })
+      this.builder({
+        req,
+        params: this.validateParams(this.#params, req, res) as OutputParams,
+        res,
+        next,
+        values: {} as Values,
+        callback,
+      })
     }
   }
 }
