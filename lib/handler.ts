@@ -4,20 +4,20 @@ import type { NextFunction, Request, Response } from 'express'
 import { HandlerError } from './errors'
 
 class Handler<
-  Values,
+  Values extends unknown | null,
   InputParams extends string[] | null,
   OutputParams extends { [key: string]: string } | null,
 > {
-  #schema?: z.Schema<Values>
+  #schema = null as z.Schema<Values> | null
   #params = null as InputParams
 
-  private validateParams<T extends InputParams>(
+  #validateParams<T extends InputParams>(
     params: T,
     req: Request,
     res: Response,
-  ) {
+  ): OutputParams {
     if (!params) {
-      return null
+      return null as OutputParams
     }
 
     const schema = z.object(
@@ -26,13 +26,14 @@ class Handler<
     const result = schema.safeParse(req.params)
 
     if (!result.success) {
-      return res.status(400).json(result.error.format())
+      res.status(400).json(result.error.format())
+      return null as OutputParams
     }
 
-    return result.data
+    return result.data as NonNullable<OutputParams>
   }
 
-  private async builder({
+  async #builder({
     callback,
     ...args
   }: {
@@ -99,9 +100,9 @@ class Handler<
         return res.status(400).json(result.error.format())
       }
 
-      this.builder({
+      this.#builder({
         req,
-        params: this.validateParams(this.#params, req, res),
+        params: this.#validateParams(this.#params, req, res),
         res,
         next,
         values: result.data,
@@ -119,9 +120,9 @@ class Handler<
     }) => Promise<void>,
   ) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      this.builder({
+      this.#builder({
         req,
-        params: this.validateParams(this.#params, req, res) as OutputParams,
+        params: this.#validateParams(this.#params, req, res),
         res,
         next,
         values: {} as Values,
