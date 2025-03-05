@@ -4,12 +4,7 @@ import type { NextFunction, Request, Response } from 'express'
 import { HandlerError } from './errors'
 
 class Handler<T = unknown> {
-  private validator?: z.Schema<T>
-
-  public schema<U extends T>(schema: z.Schema<U>) {
-    this.validator = schema
-    return this as unknown as Handler<z.infer<typeof schema>>
-  }
+  #schema?: z.Schema<T>
 
   private async handleCallback({
     callback,
@@ -38,7 +33,12 @@ class Handler<T = unknown> {
     }
   }
 
-  public action(
+  schema<U extends T>(schema: z.Schema<U>) {
+    this.#schema = schema
+    return this as unknown as Handler<z.infer<typeof schema>>
+  }
+
+  action(
     callback: ({
       values,
       req,
@@ -52,11 +52,11 @@ class Handler<T = unknown> {
     }) => Promise<void>,
   ) {
     return async (req: Request, res: Response, next: NextFunction) => {
-      if (!this.validator) {
+      if (!this.#schema) {
         throw new Error('no schema provided')
       }
 
-      const result = this.validator.safeParse(req.body)
+      const result = this.#schema.safeParse(req.body)
 
       if (!result.success) {
         return res.status(400).json(result.error.format())
@@ -66,7 +66,7 @@ class Handler<T = unknown> {
     }
   }
 
-  public query(
+  query(
     callback: ({
       req,
       res,
