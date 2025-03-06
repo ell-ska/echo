@@ -1,6 +1,4 @@
-type Type = 'ACTION' | 'QUERY'
-
-type Identifier = `${Uppercase<string>}_${Type}_ERROR`
+import type { Identifier } from './logger'
 
 export class HandlerError extends Error {
   public status: number
