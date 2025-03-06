@@ -1,5 +1,5 @@
 import z from 'zod'
-import type { NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
 import { HandlerError } from './errors'
 
@@ -11,8 +11,8 @@ class Handler<
   #schema = null as z.Schema<Values> | null
   #params = null as InputParams
 
-  #validateParams<T extends InputParams>(
-    params: T,
+  #validateParams(
+    params: InputParams,
     req: Request,
     res: Response,
   ): OutputParams {
@@ -88,7 +88,7 @@ class Handler<
       values: Values
       next: NextFunction
     }) => Promise<void>,
-  ) {
+  ): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       if (!this.#schema) {
         throw new Error('no schema provided')
@@ -97,10 +97,11 @@ class Handler<
       const result = this.#schema.safeParse(req.body)
 
       if (!result.success) {
-        return res.status(400).json(result.error.format())
+        res.status(400).json(result.error.format())
+        return
       }
 
-      this.#builder({
+      await this.#builder({
         req,
         params: this.#validateParams(this.#params, req, res),
         res,
@@ -118,9 +119,9 @@ class Handler<
       res: Response
       next: NextFunction
     }) => Promise<void>,
-  ) {
+  ): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      this.#builder({
+      await this.#builder({
         req,
         params: this.#validateParams(this.#params, req, res),
         res,
