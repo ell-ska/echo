@@ -7,7 +7,7 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
   #valuesSchema = null as z.Schema<Values> | null
   #paramsSchema = null as z.Schema<Params> | null
 
-  #validateParams(req: Request, res: Response): Params {
+  #validateParams(req: Request, res: Response): Params | undefined {
     if (!this.#paramsSchema) {
       return null as Params
     }
@@ -16,7 +16,7 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
 
     if (!result.success) {
       res.status(400).json(result.error.format())
-      return null as Params
+      return
     }
 
     return result.data
@@ -71,8 +71,19 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     }) => Promise<void>,
   ): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
+      const params = this.#validateParams(req, res)
+      if (params === undefined) return
+
       if (!this.#valuesSchema) {
-        throw new Error('no schema provided')
+        this.#builder({
+          req,
+          params,
+          res,
+          next,
+          values: null as Values,
+          callback,
+        })
+        return
       }
 
       const result = this.#valuesSchema.safeParse(req.body)
@@ -82,9 +93,9 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
         return
       }
 
-      await this.#builder({
+      this.#builder({
         req,
-        params: this.#validateParams(req, res),
+        params,
         res,
         next,
         values: result.data,
@@ -102,9 +113,12 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     }) => Promise<void>,
   ): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      await this.#builder({
+      const params = this.#validateParams(req, res)
+      if (params === undefined) return
+
+      this.#builder({
         req,
-        params: this.#validateParams(req, res),
+        params,
         res,
         next,
         values: null as Values,
