@@ -2,6 +2,7 @@ import z from 'zod'
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
 import { HandlerError } from './errors'
+import { logger } from './logger'
 
 class Handler<Values extends unknown | null, Params extends unknown | null> {
   #valuesSchema = null as z.Schema<Values> | null
@@ -43,7 +44,7 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
       await callback(args)
     } catch (error) {
       if (error instanceof HandlerError) {
-        // TODO: log the error with the identifier
+        logger.error({ identifier: error.identifier, message: error.message })
         return args.res.status(error.status).json({ error: error.message })
       }
 
