@@ -3,34 +3,23 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
 import { HandlerError } from './errors'
 
-class Handler<
-  Values extends unknown | null,
-  InputParams extends string[] | null,
-  OutputParams extends { [key: string]: string } | null,
-> {
-  #schema = null as z.Schema<Values> | null
-  #params = null as InputParams
+class Handler<Values extends unknown | null, Params extends unknown | null> {
+  #valuesSchema = null as z.Schema<Values> | null
+  #paramsSchema = null as z.Schema<Params> | null
 
-  #validateParams(
-    params: InputParams,
-    req: Request,
-    res: Response,
-  ): OutputParams {
-    if (!params) {
-      return null as OutputParams
+  #validateParams(req: Request, res: Response): Params {
+    if (!this.#paramsSchema) {
+      return null as Params
     }
 
-    const schema = z.object(
-      Object.fromEntries(params.map((params) => [params, z.string()])),
-    )
-    const result = schema.safeParse(req.params)
+    const result = this.#paramsSchema.safeParse(req.params)
 
     if (!result.success) {
       res.status(400).json(result.error.format())
-      return null as OutputParams
+      return null as Params
     }
 
-    return result.data as NonNullable<OutputParams>
+    return result.data
   }
 
   async #builder({
@@ -38,13 +27,13 @@ class Handler<
     ...args
   }: {
     req: Request
-    params: OutputParams
+    params: Params
     res: Response
     next: NextFunction
     values: Values
     callback: (args: {
       req: Request
-      params: OutputParams
+      params: Params
       res: Response
       next: NextFunction
       values: Values
@@ -62,39 +51,31 @@ class Handler<
     }
   }
 
-  params<T extends NonNullable<InputParams>>(params: T) {
-    this.#params = params
-    return this as unknown as Handler<
-      Values,
-      typeof params,
-      { [K in T[number]]: string }
-    >
+  params<T extends Params>(schema: z.Schema<T>) {
+    this.#paramsSchema = schema
+    return this as unknown as Handler<Values, z.infer<typeof schema>>
   }
 
-  schema<T extends Values>(schema: z.Schema<T>) {
-    this.#schema = schema
-    return this as unknown as Handler<
-      z.infer<typeof schema>,
-      InputParams,
-      OutputParams
-    >
+  values<T extends Values>(schema: z.Schema<T>) {
+    this.#valuesSchema = schema
+    return this as unknown as Handler<z.infer<typeof schema>, Params>
   }
 
   action(
     callback: (args: {
       req: Request
-      params: OutputParams
+      params: Params
       res: Response
       values: Values
       next: NextFunction
     }) => Promise<void>,
   ): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      if (!this.#schema) {
+      if (!this.#valuesSchema) {
         throw new Error('no schema provided')
       }
 
-      const result = this.#schema.safeParse(req.body)
+      const result = this.#valuesSchema.safeParse(req.body)
 
       if (!result.success) {
         res.status(400).json(result.error.format())
@@ -103,7 +84,7 @@ class Handler<
 
       await this.#builder({
         req,
-        params: this.#validateParams(this.#params, req, res),
+        params: this.#validateParams(req, res),
         res,
         next,
         values: result.data,
@@ -115,7 +96,7 @@ class Handler<
   query(
     callback: (args: {
       req: Request
-      params: OutputParams
+      params: Params
       res: Response
       next: NextFunction
     }) => Promise<void>,
@@ -123,10 +104,10 @@ class Handler<
     return async (req: Request, res: Response, next: NextFunction) => {
       await this.#builder({
         req,
-        params: this.#validateParams(this.#params, req, res),
+        params: this.#validateParams(req, res),
         res,
         next,
-        values: {} as Values,
+        values: null as Values,
         callback,
       })
     }
