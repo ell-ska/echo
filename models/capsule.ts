@@ -1,6 +1,27 @@
 import { InferSchemaType, model, Schema } from 'mongoose'
 
 import { imageSchema } from '../schemas/image'
+import { z } from 'zod'
+
+const lockValidation = {
+  validator: function () {
+    const schema = z
+      .object({
+        lockedAt: z.date().optional(),
+        unlockDate: z.date().optional(),
+      })
+      .refine((data) => {
+        return (
+          (data.lockedAt && data.unlockDate) ||
+          (!data.lockedAt && !data.unlockDate)
+        )
+      })
+
+    const { success } = schema.safeParse(this)
+    return success
+  },
+  message: 'document must have either both lockedAt and unlockDate, or neither',
+}
 
 const schema = new Schema(
   {
@@ -11,9 +32,11 @@ const schema = new Schema(
     },
     lockedAt: {
       type: Date,
+      validate: lockValidation,
     },
     unlockDate: {
       type: Date,
+      validate: lockValidation,
     },
     showCountdown: {
       type: Boolean,
