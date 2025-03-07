@@ -1,4 +1,4 @@
-type Scope = 'action' | 'query' | 'database' | 'server'
+type Scope = 'action' | 'query' | 'handler' | 'database' | 'server'
 export type Identifier = `${Scope}_${Lowercase<string>}`
 
 type Parameter = { identifier: Identifier; message: string }
