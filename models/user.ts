@@ -29,13 +29,13 @@ const schema = new Schema(
       unique: true,
       trim: true,
       lowercase: true,
-      validate: [
-        (email: unknown) => {
+      validate: {
+        validator: (email: unknown) => {
           const schema = z.string().email()
           const { success } = schema.safeParse(email)
           return success
         },
-      ],
+      },
     },
     image: imageSchema,
     password: {
