@@ -1,12 +1,14 @@
 import { Router } from 'express'
 
+import { authController } from '../controller/auth'
+
 export const router = Router()
 
 // auth router
 
 const authRouter = Router()
 
-authRouter.post('/register')
+authRouter.post('/register', authController.register)
 authRouter.post('/log-in')
 authRouter.get('/log-out')
 authRouter.post('/token/refresh')
