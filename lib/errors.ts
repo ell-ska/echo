@@ -8,11 +8,12 @@ export class NotFoundError extends Error {
   }
 }
 
-export class ValidationError extends Error {
-  public status = 400
+export class ActionError extends Error {
+  public status: number
 
-  constructor(message: string) {
+  constructor(message: string, status: number) {
     super(message)
+    this.status = status
   }
 }
 

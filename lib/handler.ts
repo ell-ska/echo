@@ -2,10 +2,10 @@ import z from 'zod'
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
 import {
+  ActionError,
   AuthError,
   NotFoundError,
   UnexpectedError,
-  ValidationError,
 } from './errors'
 import { logger } from './logger'
 
@@ -50,7 +50,7 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     } catch (error) {
       if (
         error instanceof NotFoundError ||
-        error instanceof ValidationError ||
+        error instanceof ActionError ||
         error instanceof AuthError
       ) {
         return args.res.status(error.status).json({ error: error.message })
