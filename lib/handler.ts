@@ -1,7 +1,12 @@
 import z from 'zod'
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
 
-import { HandlerError } from './errors'
+import {
+  AuthError,
+  NotFoundError,
+  UnexpectedError,
+  ValidationError,
+} from './errors'
 import { logger } from './logger'
 
 class Handler<Values extends unknown | null, Params extends unknown | null> {
@@ -43,11 +48,23 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     try {
       await callback(args)
     } catch (error) {
-      if (error instanceof HandlerError) {
+      if (
+        error instanceof NotFoundError ||
+        error instanceof ValidationError ||
+        error instanceof AuthError
+      ) {
+        return args.res.status(error.status).json({ error: error.message })
+      }
+
+      if (error instanceof UnexpectedError) {
         logger.error({ identifier: error.identifier, message: error.message })
         return args.res.status(error.status).json({ error: error.message })
       }
 
+      logger.error({
+        identifier: 'handler_unknown',
+        message: error instanceof Error ? error.message : 'unknow error',
+      })
       return args.res.status(500).json({ error: 'something went wrong' })
     }
   }
