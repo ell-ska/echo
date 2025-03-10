@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose'
+import { Schema, Types } from 'mongoose'
 
 export const imageSchema = new Schema(
   {
@@ -10,6 +10,12 @@ export const imageSchema = new Schema(
       type: Number,
       required: true,
     },
+    accessibleBy: [
+      {
+        type: Types.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     timestamps: true,
