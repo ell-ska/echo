@@ -9,9 +9,22 @@ import {
 } from './errors'
 import { logger } from './logger'
 
+type MiddlewareFunction = (args: { next: () => void }) => void
+
 class Handler<Values extends unknown | null, Params extends unknown | null> {
-  #valuesSchema = null as z.Schema<Values> | null
-  #paramsSchema = null as z.Schema<Params> | null
+  #valuesSchema: z.Schema<Values> | undefined
+  #paramsSchema: z.Schema<Params> | undefined
+  #middlewares: MiddlewareFunction[] = []
+
+  constructor(opts?: {
+    valuesSchema?: z.Schema<Values>
+    paramsSchema?: z.Schema<Params>
+    middlewares: MiddlewareFunction[]
+  }) {
+    if (opts?.valuesSchema) this.#valuesSchema = opts.valuesSchema
+    if (opts?.paramsSchema) this.#paramsSchema = opts.paramsSchema
+    if (opts?.middlewares) this.#middlewares = opts.middlewares
+  }
 
   #validateParams(req: Request, res: Response): Params | undefined {
     if (!this.#paramsSchema) {
@@ -26,6 +39,18 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     }
 
     return result.data
+  }
+
+
+  async #executeMiddlewares(index = 0) {
+    const middleware = this.#middlewares[index]
+    if (!middleware) return
+
+    middleware({
+      next: async () => {
+        await this.#executeMiddlewares(index + 1)
+      },
+    })
   }
 
   async #builder({
@@ -46,6 +71,7 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     }) => Promise<void>
   }) {
     try {
+      this.#executeMiddlewares()
       await callback(args)
     } catch (error) {
       if (
@@ -69,14 +95,28 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     }
   }
 
+  use(middleware: MiddlewareFunction) {
+    return new Handler({
+      middlewares: [...this.#middlewares, middleware],
+      paramsSchema: this.#paramsSchema,
+      valuesSchema: this.#valuesSchema,
+    })
+  }
+
   params<T extends Params>(schema: z.Schema<T>) {
-    this.#paramsSchema = schema
-    return this as unknown as Handler<Values, z.infer<typeof schema>>
+    return new Handler({
+      paramsSchema: schema,
+      valuesSchema: this.#valuesSchema,
+      middlewares: this.#middlewares,
+    })
   }
 
   values<T extends Values>(schema: z.Schema<T>) {
-    this.#valuesSchema = schema
-    return this as unknown as Handler<z.infer<typeof schema>, Params>
+    return new Handler({
+      valuesSchema: schema,
+      paramsSchema: this.#paramsSchema,
+      middlewares: this.#middlewares,
+    })
   }
 
   action(
