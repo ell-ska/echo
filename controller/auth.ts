@@ -1,4 +1,6 @@
 import { z } from 'zod'
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 import { handler } from '../lib/handler'
 import { passwordSchema, usernameSchema } from '../lib/validation'
@@ -40,4 +42,40 @@ export const authController = {
         res.status(201).json({ message: 'user registered successfully' })
       },
     ),
+  login: handler
+    .values(
+      z
+        .object({
+          username: z.string().optional(),
+          email: z.string().email().optional(),
+          password: z.string(),
+        })
+        .refine(({ username, email }) => username || email, {
+          message: 'either username or email must be provided',
+        }),
+    )
+    .action(async ({ res, values: { email, username, password } }) => {
+      const user = await User.findOne(
+        {
+          $or: [{ username }, { email }],
+        },
+        '+password',
+      )
+
+      if (!user || !(await bcrypt.compare(password, user.password))) {
+        throw new ActionError('wrong username or password', 400)
+      }
+
+      const accessToken = jwt.sign(
+        { userId: user._id },
+        process.env.ACCESS_TOKEN_SECRET!,
+        { expiresIn: '1h' },
+      )
+      const refreshToken = jwt.sign(
+        { userId: user._id },
+        process.env.REFRESH_TOKEN_SECRET!,
+      )
+
+      res.status(200).json({ accessToken, refreshToken })
+    }),
 }
