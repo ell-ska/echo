@@ -13,3 +13,9 @@ export const usernameSchema = z
   .string()
   .min(3, 'username must be at least 3 characters')
   .max(30, 'username cannot be longer than 30 characters')
+
+export const imageSchema = z.object({
+  name: z.string(),
+  type: z.string(),
+  size: z.number(),
+})
