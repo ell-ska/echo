@@ -1,6 +1,12 @@
 import z from 'zod'
 import { connection, mongo } from 'mongoose'
-import type { NextFunction, Request, RequestHandler, Response } from 'express'
+import jwt from 'jsonwebtoken'
+import type {
+  NextFunction,
+  Request as ExpressRequest,
+  RequestHandler,
+  Response,
+} from 'express'
 
 import {
   ActionError,
@@ -9,6 +15,9 @@ import {
   UnexpectedError,
 } from './errors'
 import { logger } from './logger'
+import { User } from '../models/user'
+
+type Request = ExpressRequest & { userId?: string }
 
 type HandlerArguments<Params, Values> = {
   req: Request
@@ -25,13 +34,16 @@ type HandlerFunction<Params, Values> = (
 class Handler<Values extends unknown | null, Params extends unknown | null> {
   #valuesSchema: z.Schema<Values> | undefined
   #paramsSchema: z.Schema<Params> | undefined
+  #middlewares: HandlerFunction<Params, Values>[] = []
 
   constructor(opts?: {
     valuesSchema?: z.Schema<Values>
     paramsSchema?: z.Schema<Params>
+    middlewares: HandlerFunction<Params, Values>[]
   }) {
     if (opts?.valuesSchema) this.#valuesSchema = opts.valuesSchema
     if (opts?.paramsSchema) this.#paramsSchema = opts.paramsSchema
+    if (opts?.middlewares) this.#middlewares = opts.middlewares
   }
 
   #validateParams(req: Request, res: Response): Params | undefined {
@@ -87,6 +99,48 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     }
   }
 
+  async #executeMiddlewares({
+    index = 0,
+    ...args
+  }: Omit<HandlerArguments<Params, Values>, 'next'> & {
+    index?: number
+  }) {
+    const middleware = this.#middlewares[index]
+    if (!middleware) return
+
+    await middleware({
+      ...args,
+      next: async () => {
+        await this.#executeMiddlewares({ ...args, index: index + 1 })
+      },
+    })
+  }
+
+  async #authenticate({ req, next }: HandlerArguments<Params, Values>) {
+    const authHeader = req.headers.authorization
+    const accessToken = authHeader?.split(' ')[1]
+
+    if (!accessToken) {
+      throw new AuthError('access token missing', 401)
+    }
+
+    const decodedToken = jwt.verify(
+      accessToken,
+      process.env.ACCESS_TOKEN_SECRET!,
+    )
+
+    if (!decodedToken || typeof decodedToken === 'string') {
+      throw new AuthError('access token expired', 401)
+    }
+
+    if (!(await User.exists({ _id: decodedToken.userId }))) {
+      throw new AuthError('user does not exist', 401)
+    }
+
+    req.userId = decodedToken.userId
+    next()
+  }
+
   async #builder({
     callback,
     ...args
@@ -96,9 +150,10 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     res: Response
     next: NextFunction
     values: Values
-    callback: (args: HandlerArguments<Params, Values>) => Promise<void>
+    callback: HandlerFunction<Params, Values>
   }) {
     try {
+      await this.#executeMiddlewares(args)
       await callback(args)
     } catch (error) {
       if (
@@ -122,10 +177,19 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     }
   }
 
+  authenticate() {
+    return new Handler({
+      middlewares: [...this.#middlewares, this.#authenticate],
+      paramsSchema: this.#paramsSchema,
+      valuesSchema: this.#valuesSchema,
+    })
+  }
+
   params<T extends Params>(schema: z.Schema<T>) {
     return new Handler({
       paramsSchema: schema,
       valuesSchema: this.#valuesSchema,
+      middlewares: this.#middlewares,
     })
   }
 
@@ -133,6 +197,7 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     return new Handler({
       valuesSchema: schema,
       paramsSchema: this.#paramsSchema,
+      middlewares: this.#middlewares,
     })
   }
 
