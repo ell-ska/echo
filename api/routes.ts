@@ -10,7 +10,7 @@ const authRouter = Router()
 
 authRouter.post('/register', authController.register)
 authRouter.post('/log-in', authController.login)
-authRouter.get('/log-out')
+authRouter.delete('/log-out', authController.logout)
 authRouter.post('/token/refresh')
 
 router.use('/auth', authRouter)
