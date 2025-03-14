@@ -1,6 +1,9 @@
 import { Router } from 'express'
+import multer from 'multer'
 
 import { authController } from '../controller/auth'
+
+const upload = multer()
 
 export const router = Router()
 
@@ -8,7 +11,7 @@ export const router = Router()
 
 const authRouter = Router()
 
-authRouter.post('/register', authController.register)
+authRouter.post('/register', upload.single('image'), authController.register)
 authRouter.post('/log-in', authController.login)
 authRouter.delete('/log-out', authController.logout)
 authRouter.post('/token/refresh')

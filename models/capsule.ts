@@ -4,7 +4,7 @@ import { imageSchema } from '../schemas/image'
 import { z } from 'zod'
 
 const lockValidation = {
-  validator: function () {
+  validator: () => {
     const schema = z
       .object({
         lockedAt: z.date().optional(),
