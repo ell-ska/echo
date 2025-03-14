@@ -29,7 +29,7 @@ type HandlerArguments<Params, Values> = {
 
 type HandlerFunction<Params, Values> = (
   args: HandlerArguments<Params, Values>,
-) => Promise<void>
+) => Promise<void> | void
 
 class Handler<Values extends unknown | null, Params extends unknown | null> {
   #valuesSchema: z.Schema<Values> | undefined

@@ -83,4 +83,8 @@ export const authController = {
       })
       res.status(200).json({ accessToken })
     }),
+  logout: handler.authenticate().action(({ res }) => {
+    res.clearCookie('refreshToken', { httpOnly: true, secure: true })
+    res.status(200).json({ message: 'logged out' })
+  }),
 }
