@@ -76,6 +76,10 @@ export const authController = {
         process.env.REFRESH_TOKEN_SECRET!,
       )
 
-      res.status(200).json({ accessToken, refreshToken })
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: true,
+      })
+      res.status(200).json({ accessToken })
     }),
 }
