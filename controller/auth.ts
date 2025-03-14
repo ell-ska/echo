@@ -3,12 +3,11 @@ import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
 import { handler } from '../lib/handler'
-import { passwordSchema, usernameSchema } from '../lib/validation'
+import { imageSchema, passwordSchema, usernameSchema } from '../lib/validation'
 import { User } from '../models/user'
 import { ActionError } from '../lib/errors'
 
 export const authController = {
-  // TODO: add image
   register: handler
     .values(
       z.object({
@@ -17,12 +16,13 @@ export const authController = {
         lastName: z.string(),
         email: z.string().email(),
         password: passwordSchema,
+        image: imageSchema.optional(),
       }),
     )
     .action(
       async ({
         res,
-        values: { username, firstName, lastName, email, password },
+        values: { username, firstName, lastName, email, password, image },
       }) => {
         const existingUser = await User.findOne({
           $or: [{ email }, { username }],
@@ -37,6 +37,7 @@ export const authController = {
           lastName,
           email,
           password,
+          image: image ? { ...image, visibility: 'public' } : undefined,
         })
 
         res.status(201).json({ message: 'user registered successfully' })

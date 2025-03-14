@@ -16,22 +16,39 @@ export const imageSchema = new Schema(
       type: Number,
       required: true,
     },
+    visibility: {
+      type: String,
+      enum: ['public', 'private'],
+      required: true,
+      default: 'private',
+    },
     accessibleBy: {
       type: [
         {
           type: Types.ObjectId,
           ref: 'User',
-          required: true,
         },
       ],
-      required: true,
       validate: {
         validator(accessibleBy: unknown) {
-          const schema = z.array(z.string().uuid()).min(1)
-          const { success } = schema.safeParse(accessibleBy)
-          return success
+          if (!('visibility' in this)) {
+            return false
+          }
+
+          if (this.visibility === 'private') {
+            const schema = z.array(z.instanceof(Types.ObjectId)).min(1)
+            const { success } = schema.safeParse(accessibleBy)
+            return success
+          }
+
+          if (this.visibility === 'public') {
+            const schema = z.tuple([])
+            const { success } = schema.safeParse(accessibleBy)
+            return success
+          }
         },
-        message: 'the image must be accessible by at least one user',
+        message:
+          'private images must be accessible by at least one user, public images should not have an accessible by list',
       },
     },
   },
