@@ -1,3 +1,5 @@
+import type { ZodError } from 'zod'
+
 import type { Identifier } from './logger'
 
 export class NotFoundError extends Error {
@@ -8,12 +10,23 @@ export class NotFoundError extends Error {
   }
 }
 
-export class ActionError extends Error {
+export class HandlerError extends Error {
   public status: number
 
   constructor(message: string, status: number) {
     super(message)
     this.status = status
+  }
+}
+
+export class ValidationError {
+  public status = 400
+  public message: {
+    _errors: string[]
+  }
+
+  constructor(error: ZodError) {
+    this.message = error.format()
   }
 }
 
