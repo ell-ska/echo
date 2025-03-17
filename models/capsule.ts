@@ -67,4 +67,13 @@ const schema = new Schema(
   },
 )
 
-export const Capsule = model<InferSchemaType<typeof schema>>('Capsule', schema)
+schema.method('isUnlocked', function () {
+  return this.unlockDate && this.unlockDate <= new Date()
+})
+
+type Methods = {
+  isUnlocked: () => boolean
+}
+type Model = InferSchemaType<typeof schema> & Methods
+
+export const Capsule = model<Model>('Capsule', schema)
