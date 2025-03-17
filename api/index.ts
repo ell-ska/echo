@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
+import cookieParser from 'cookie-parser'
 import 'dotenv/config'
 
 import { db } from '../db'
@@ -16,6 +17,7 @@ app.use(
 )
 app.use(helmet())
 app.use(express.json())
+app.use(cookieParser())
 
 app.use(router)
 
