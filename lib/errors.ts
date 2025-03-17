@@ -18,9 +18,9 @@ export class ActionError extends Error {
 }
 
 export class AuthError extends Error {
-  public status: 401 | 403
+  public status: 401 | 403 | 404
 
-  constructor(message: string, status: 401 | 403) {
+  constructor(message: string, status: 401 | 403 | 404) {
     super(message)
     this.status = status
   }
