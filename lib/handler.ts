@@ -21,39 +21,47 @@ import { tokenSchema } from './validation'
 
 type Request = ExpressRequest & { userId?: string }
 
-type HandlerArguments<Params, Values> = {
+type HandlerArguments<Params, Values, Cookies> = {
   req: Request
   params: Params
   res: Response
-  next: NextFunction
   values: Values
+  cookies: Cookies
+  next: NextFunction
 }
 
-type HandlerFunction<Params, Values> = (
-  args: HandlerArguments<Params, Values>,
+type HandlerFunction<Params, Values, Cookies> = (
+  args: HandlerArguments<Params, Values, Cookies>,
 ) => Promise<void> | void
 
-class Handler<Values extends unknown | null, Params extends unknown | null> {
+class Handler<
+  Values extends unknown | null,
+  Params extends unknown | null,
+  Cookies extends unknown | null,
+> {
   #valuesSchema: z.Schema<Values> | undefined
   #paramsSchema: z.Schema<Params> | undefined
-  #middlewares: HandlerFunction<Params, Values>[] = []
+  #cookieSchema: z.Schema<Cookies> | undefined
+  #middlewares: HandlerFunction<Params, Values, Cookies>[] = []
 
   constructor(opts?: {
     valuesSchema?: z.Schema<Values>
     paramsSchema?: z.Schema<Params>
-    middlewares: HandlerFunction<Params, Values>[]
+    cookieSchema?: z.Schema<Cookies>
+    middlewares: HandlerFunction<Params, Values, Cookies>[]
   }) {
     if (opts?.valuesSchema) this.#valuesSchema = opts.valuesSchema
     if (opts?.paramsSchema) this.#paramsSchema = opts.paramsSchema
+    if (opts?.cookieSchema) this.#cookieSchema = opts.cookieSchema
     if (opts?.middlewares) this.#middlewares = opts.middlewares
   }
 
-  #validateParams(params: Request['params']): Params {
-    if (!this.#paramsSchema) {
-      return null as Params
+  #validate(schema: z.Schema<unknown> | undefined, values: unknown) {
+    if (!schema) {
+      return null
     }
 
-    const { success, error, data } = this.#paramsSchema.safeParse(params)
+    const { success, error, data } = schema.safeParse(values)
 
     if (!success) {
       throw new ValidationError(error)
@@ -62,18 +70,16 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     return data
   }
 
-  #validateValues(body: Request['body']): Values {
-    if (!this.#valuesSchema) {
-      return null as Values
-    }
+  #validateParams(params: Request['params']) {
+    return this.#validate(this.#paramsSchema, params) as Params
+  }
 
-    const { success, error, data } = this.#valuesSchema.safeParse(body)
+  #validateValues(body: Request['body']) {
+    return this.#validate(this.#valuesSchema, body) as Values
+  }
 
-    if (!success) {
-      throw new ValidationError(error)
-    }
-
-    return data
+  #validateCookies(cookies: Request['cookies']) {
+    return this.#validate(this.#cookieSchema, cookies) as Cookies
   }
 
   async #upload(req: Request) {
@@ -117,7 +123,7 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
   async #executeMiddlewares({
     index = 0,
     ...args
-  }: Omit<HandlerArguments<Params, Values>, 'next'> & {
+  }: Omit<HandlerArguments<Params, Values, Cookies>, 'next'> & {
     index?: number
   }) {
     const middleware = this.#middlewares[index]
@@ -153,7 +159,10 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     return res.status(500).json({ error: 'something went wrong' })
   }
 
-  async #authenticate({ req, next }: HandlerArguments<Params, Values>) {
+  async #authenticate({
+    req,
+    next,
+  }: HandlerArguments<Params, Values, Cookies>) {
     const authHeader = req.headers.authorization
     const accessToken = authHeader?.split(' ')[1]
 
@@ -191,6 +200,7 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
       middlewares: [...this.#middlewares, this.#authenticate],
       paramsSchema: this.#paramsSchema,
       valuesSchema: this.#valuesSchema,
+      cookieSchema: this.#cookieSchema,
     })
   }
 
@@ -198,6 +208,7 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     return new Handler({
       paramsSchema: schema,
       valuesSchema: this.#valuesSchema,
+      cookieSchema: this.#cookieSchema,
       middlewares: this.#middlewares,
     })
   }
@@ -206,11 +217,21 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     return new Handler({
       valuesSchema: schema,
       paramsSchema: this.#paramsSchema,
+      cookieSchema: this.#cookieSchema,
       middlewares: this.#middlewares,
     })
   }
 
-  execute(callback: HandlerFunction<Params, Values>): RequestHandler {
+  cookies<T extends Cookies>(schema: z.Schema<T>) {
+    return new Handler({
+      cookieSchema: schema,
+      valuesSchema: this.#valuesSchema,
+      paramsSchema: this.#paramsSchema,
+      middlewares: this.#middlewares,
+    })
+  }
+
+  execute(callback: HandlerFunction<Params, Values, Cookies>): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {
         const params = this.#validateParams(req.params)
@@ -220,14 +241,16 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
         }
 
         const values = this.#validateValues(req.body)
+        const cookies = this.#validateCookies(req.cookies)
 
         const args = {
           req,
           params,
           res,
           values,
+          cookies,
           next,
-        } satisfies HandlerArguments<Params, Values>
+        } satisfies HandlerArguments<Params, Values, Cookies>
 
         await this.#executeMiddlewares(args)
         await callback(args)
