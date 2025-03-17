@@ -95,7 +95,7 @@ export const authController = {
       )
 
       if (!user || !(await bcrypt.compare(password, user.password))) {
-        throw new HandlerError('wrong username or password', 400)
+        throw new HandlerError('wrong email, username or password', 400)
       }
 
       await tokenResponse({ userId: user._id, res })
