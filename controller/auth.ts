@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 import { handler } from '../lib/handler'
 import { imageSchema, passwordSchema, usernameSchema } from '../lib/validation'
 import { User } from '../models/user'
-import { ActionError } from '../lib/errors'
+import { HandlerError } from '../lib/errors'
 
 export const authController = {
   register: handler
@@ -19,7 +19,7 @@ export const authController = {
         image: imageSchema.optional(),
       }),
     )
-    .action(
+    .execute(
       async ({
         res,
         values: { username, firstName, lastName, email, password, image },
@@ -28,7 +28,7 @@ export const authController = {
           $or: [{ email }, { username }],
         })
         if (existingUser) {
-          throw new ActionError('email or username already in use', 400)
+          throw new HandlerError('email or username already in use', 400)
         }
 
         await User.create({
@@ -55,7 +55,7 @@ export const authController = {
           message: 'either username or email must be provided',
         }),
     )
-    .action(async ({ res, values: { email, username, password } }) => {
+    .execute(async ({ res, values: { email, username, password } }) => {
       const user = await User.findOne(
         {
           $or: [{ username }, { email }],
@@ -64,7 +64,7 @@ export const authController = {
       )
 
       if (!user || !(await bcrypt.compare(password, user.password))) {
-        throw new ActionError('wrong username or password', 400)
+        throw new HandlerError('wrong username or password', 400)
       }
 
       const accessToken = jwt.sign(
@@ -84,7 +84,7 @@ export const authController = {
       })
       res.status(200).json({ accessToken })
     }),
-  logout: handler.authenticate().action(({ res }) => {
+  logout: handler.authenticate().execute(({ res }) => {
     res.clearCookie('refreshToken', { httpOnly: true, secure: true })
     res.status(200).json({ message: 'logged out' })
   }),

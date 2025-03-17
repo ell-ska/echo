@@ -9,10 +9,11 @@ import type {
 } from 'express'
 
 import {
-  ActionError,
   AuthError,
+  HandlerError,
   NotFoundError,
   UnexpectedError,
+  ValidationError,
 } from './errors'
 import { logger } from './logger'
 import { User } from '../models/user'
@@ -47,19 +48,32 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     if (opts?.middlewares) this.#middlewares = opts.middlewares
   }
 
-  #validateParams(req: Request, res: Response): Params | undefined {
+  #validateParams(params: Request['params']): Params {
     if (!this.#paramsSchema) {
       return null as Params
     }
 
-    const result = this.#paramsSchema.safeParse(req.params)
+    const { success, error, data } = this.#paramsSchema.safeParse(params)
 
-    if (!result.success) {
-      res.status(400).json(result.error.format())
-      return
+    if (!success) {
+      throw new ValidationError(error)
     }
 
-    return result.data
+    return data
+  }
+
+  #validateValues(body: Request['body']): Values {
+    if (!this.#valuesSchema) {
+      return null as Values
+    }
+
+    const { success, error, data } = this.#valuesSchema.safeParse(body)
+
+    if (!success) {
+      throw new ValidationError(error)
+    }
+
+    return data
   }
 
   async #upload(req: Request) {
@@ -117,6 +131,28 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     })
   }
 
+  #handleError({ error, res }: { error: unknown; res: Response }) {
+    if (
+      error instanceof ValidationError ||
+      error instanceof NotFoundError ||
+      error instanceof HandlerError ||
+      error instanceof AuthError
+    ) {
+      return res.status(error.status).json({ error: error.message })
+    }
+
+    if (error instanceof UnexpectedError) {
+      logger.error({ identifier: error.identifier, message: error.message })
+      return res.status(error.status).json({ error: error.message })
+    }
+
+    logger.error({
+      identifier: 'handler_unknown',
+      message: error instanceof Error ? error.message : 'unknown error',
+    })
+    return res.status(500).json({ error: 'something went wrong' })
+  }
+
   async #authenticate({ req, next }: HandlerArguments<Params, Values>) {
     const authHeader = req.headers.authorization
     const accessToken = authHeader?.split(' ')[1]
@@ -150,42 +186,6 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     next()
   }
 
-  async #builder({
-    callback,
-    ...args
-  }: {
-    req: Request
-    params: Params
-    res: Response
-    next: NextFunction
-    values: Values
-    callback: HandlerFunction<Params, Values>
-  }) {
-    try {
-      await this.#executeMiddlewares(args)
-      await callback(args)
-    } catch (error) {
-      if (
-        error instanceof NotFoundError ||
-        error instanceof ActionError ||
-        error instanceof AuthError
-      ) {
-        return args.res.status(error.status).json({ error: error.message })
-      }
-
-      if (error instanceof UnexpectedError) {
-        logger.error({ identifier: error.identifier, message: error.message })
-        return args.res.status(error.status).json({ error: error.message })
-      }
-
-      logger.error({
-        identifier: 'handler_unknown',
-        message: error instanceof Error ? error.message : 'unknown error',
-      })
-      return args.res.status(500).json({ error: 'something went wrong' })
-    }
-  }
-
   authenticate() {
     return new Handler({
       middlewares: [...this.#middlewares, this.#authenticate],
@@ -210,58 +210,30 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
     })
   }
 
-  action(callback: HandlerFunction<Params, Values>): RequestHandler {
+  execute(callback: HandlerFunction<Params, Values>): RequestHandler {
     return async (req: Request, res: Response, next: NextFunction) => {
-      const params = this.#validateParams(req, res)
-      if (params === undefined) return
+      try {
+        const params = this.#validateParams(req.params)
 
-      if (req.file || req.files) {
-        await this.#upload(req)
-      }
+        if (req.file || req.files) {
+          await this.#upload(req)
+        }
 
-      if (!this.#valuesSchema) {
-        this.#builder({
+        const values = this.#validateValues(req.body)
+
+        const args = {
           req,
           params,
           res,
+          values,
           next,
-          values: null as Values,
-          callback,
-        })
-        return
+        } satisfies HandlerArguments<Params, Values>
+
+        await this.#executeMiddlewares(args)
+        await callback(args)
+      } catch (error) {
+        this.#handleError({ error, res })
       }
-
-      const result = this.#valuesSchema.safeParse(req.body)
-
-      if (!result.success) {
-        res.status(400).json(result.error.format())
-        return
-      }
-
-      this.#builder({
-        req,
-        params,
-        res,
-        next,
-        values: result.data,
-        callback,
-      })
-    }
-  }
-
-  query(callback: HandlerFunction<Params, Values>): RequestHandler {
-    return async (req: Request, res: Response, next: NextFunction) => {
-      const params = this.#validateParams(req, res)
-      if (params === undefined) return
-
-      this.#builder({
-        req,
-        params,
-        res,
-        next,
-        values: null as Values,
-        callback,
-      })
     }
   }
 }
