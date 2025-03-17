@@ -14,7 +14,7 @@ const authRouter = Router()
 authRouter.post('/register', upload.single('image'), authController.register)
 authRouter.post('/log-in', authController.login)
 authRouter.delete('/log-out', authController.logout)
-authRouter.post('/token/refresh')
+authRouter.post('/token/refresh', authController.refreshToken)
 
 router.use('/auth', authRouter)
 

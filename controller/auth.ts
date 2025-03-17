@@ -1,11 +1,42 @@
 import { z } from 'zod'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import type { Response } from 'express'
+import type { Types } from 'mongoose'
 
 import { handler } from '../lib/handler'
-import { imageSchema, passwordSchema, usernameSchema } from '../lib/validation'
+import {
+  imageSchema,
+  passwordSchema,
+  tokenSchema,
+  usernameSchema,
+} from '../lib/validation'
 import { User } from '../models/user'
-import { HandlerError } from '../lib/errors'
+import { AuthError, HandlerError } from '../lib/errors'
+import { RefreshToken } from '../models/refresh-token'
+
+const tokenResponse = async ({
+  userId,
+  res,
+}: {
+  userId: Types.ObjectId | string
+  res: Response
+}) => {
+  const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET!, {
+    expiresIn: '15m',
+  })
+  const refreshToken = jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET!, {
+    expiresIn: '7d',
+  })
+
+  await RefreshToken.insertOne({ token: refreshToken })
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+  })
+  res.status(200).json({ accessToken })
+}
 
 export const authController = {
   register: handler
@@ -67,25 +98,41 @@ export const authController = {
         throw new HandlerError('wrong username or password', 400)
       }
 
-      const accessToken = jwt.sign(
-        { userId: user._id },
-        process.env.ACCESS_TOKEN_SECRET!,
-        { expiresIn: '15m' },
-      )
-      const refreshToken = jwt.sign(
-        { userId: user._id },
-        process.env.REFRESH_TOKEN_SECRET!,
-        { expiresIn: '7d' },
-      )
-
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: true,
-      })
-      res.status(200).json({ accessToken })
+      await tokenResponse({ userId: user._id, res })
     }),
   logout: handler.authenticate().execute(({ res }) => {
     res.clearCookie('refreshToken', { httpOnly: true, secure: true })
     res.status(200).json({ message: 'logged out' })
   }),
+  refreshToken: handler
+    .cookies(z.object({ refreshToken: z.string() }))
+    .execute(async ({ res, cookies: { refreshToken } }) => {
+      if (!(await RefreshToken.exists({ token: refreshToken }))) {
+        throw new AuthError('invalid or expired refresh token', 401)
+      }
+
+      let decodedToken
+
+      try {
+        decodedToken = jwt.verify(
+          refreshToken,
+          process.env.REFRESH_TOKEN_SECRET!,
+        )
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'invalid refresh token'
+
+        throw new AuthError(message, 401)
+      }
+
+      const { success, data } = tokenSchema.safeParse(decodedToken)
+
+      if (!success) {
+        throw new AuthError('malformed refresh token', 401)
+      }
+
+      await RefreshToken.findOneAndDelete({ token: refreshToken })
+
+      await tokenResponse({ userId: data.userId, res })
+    }),
 }
