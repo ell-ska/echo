@@ -19,3 +19,7 @@ export const imageSchema = z.object({
   type: z.string(),
   size: z.number(),
 })
+
+export const tokenSchema = z.object({
+  userId: z.string(),
+})

@@ -16,6 +16,7 @@ import {
 } from './errors'
 import { logger } from './logger'
 import { User } from '../models/user'
+import { tokenSchema } from './validation'
 
 type Request = ExpressRequest & { userId?: string }
 
@@ -124,20 +125,28 @@ class Handler<Values extends unknown | null, Params extends unknown | null> {
       throw new AuthError('access token missing', 401)
     }
 
-    const decodedToken = jwt.verify(
-      accessToken,
-      process.env.ACCESS_TOKEN_SECRET!,
-    )
+    let decodedToken
 
-    if (!decodedToken || typeof decodedToken === 'string') {
-      throw new AuthError('access token expired', 401)
+    try {
+      decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET!)
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'invalid access token'
+
+      throw new AuthError(message, 401)
     }
 
-    if (!(await User.exists({ _id: decodedToken.userId }))) {
-      throw new AuthError('user does not exist', 401)
+    const { success, data } = tokenSchema.safeParse(decodedToken)
+
+    if (!success) {
+      throw new AuthError('malformed access token', 401)
     }
 
-    req.userId = decodedToken.userId
+    if (!(await User.exists({ _id: data.userId }))) {
+      throw new AuthError('user does not exist', 404)
+    }
+
+    req.userId = data.userId
     next()
   }
 
