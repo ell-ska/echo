@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { Types } from 'mongoose'
 
 export const passwordSchema = z
   .string()
@@ -23,3 +24,13 @@ export const imageSchema = z.object({
 export const tokenSchema = z.object({
   userId: z.string(),
 })
+
+export const objectIdSchema = z.union([
+  z.instanceof(Types.ObjectId),
+  z
+    .string()
+    .refine(
+      (value) => Types.ObjectId.isValid(value),
+      'invalid object id string',
+    ),
+])

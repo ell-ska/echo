@@ -29,6 +29,7 @@ const schema = new Schema(
       unique: true,
       trim: true,
       lowercase: true,
+      select: false,
       validate: {
         validator: (email: unknown) => {
           const schema = z.string().email()
