@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 import type { Response } from 'express'
 import type { Types } from 'mongoose'
 
-import { handler } from '../lib/handler'
+import { handle } from '../lib/handler'
 import {
   imageSchema,
   passwordSchema,
@@ -39,9 +39,31 @@ const tokenResponse = async ({
 }
 
 export const authController = {
-  register: handler
-    .values(
-      z.object({
+  register: handle(
+    async ({
+      res,
+      values: { username, firstName, lastName, email, password, image },
+    }) => {
+      const existingUser = await User.findOne({
+        $or: [{ email }, { username }],
+      })
+      if (existingUser) {
+        throw new HandlerError('email or username already in use', 400)
+      }
+
+      await User.create({
+        username,
+        firstName,
+        lastName,
+        email,
+        password,
+        image: image ? { ...image, visibility: 'public' } : undefined,
+      })
+
+      res.status(201).json({ message: 'user registered successfully' })
+    },
+    {
+      values: z.object({
         username: usernameSchema,
         firstName: z.string(),
         lastName: z.string(),
@@ -49,44 +71,10 @@ export const authController = {
         password: passwordSchema,
         image: imageSchema.optional(),
       }),
-    )
-    .execute(
-      async ({
-        res,
-        values: { username, firstName, lastName, email, password, image },
-      }) => {
-        const existingUser = await User.findOne({
-          $or: [{ email }, { username }],
-        })
-        if (existingUser) {
-          throw new HandlerError('email or username already in use', 400)
-        }
-
-        await User.create({
-          username,
-          firstName,
-          lastName,
-          email,
-          password,
-          image: image ? { ...image, visibility: 'public' } : undefined,
-        })
-
-        res.status(201).json({ message: 'user registered successfully' })
-      },
-    ),
-  login: handler
-    .values(
-      z
-        .object({
-          username: z.string().optional(),
-          email: z.string().email().optional(),
-          password: z.string(),
-        })
-        .refine(({ username, email }) => username || email, {
-          message: 'either username or email must be provided',
-        }),
-    )
-    .execute(async ({ res, values: { email, username, password } }) => {
+    },
+  ),
+  login: handle(
+    async ({ res, values: { email, username, password } }) => {
       const user = await User.findOne(
         {
           $or: [{ username }, { email }],
@@ -99,14 +87,25 @@ export const authController = {
       }
 
       await tokenResponse({ userId: user._id, res })
-    }),
-  logout: handler.authenticate().execute(({ res }) => {
+    },
+    {
+      values: z
+        .object({
+          username: z.string().optional(),
+          email: z.string().email().optional(),
+          password: z.string(),
+        })
+        .refine(({ username, email }) => username || email, {
+          message: 'either username or email must be provided',
+        }),
+    },
+  ),
+  logout: handle(({ res }) => {
     res.clearCookie('refreshToken', { httpOnly: true, secure: true })
     res.status(200).json({ message: 'logged out' })
   }),
-  refreshToken: handler
-    .cookies(z.object({ refreshToken: z.string() }))
-    .execute(async ({ res, cookies: { refreshToken } }) => {
+  refreshToken: handle(
+    async ({ res, cookies: { refreshToken } }) => {
       if (!(await RefreshToken.exists({ token: refreshToken }))) {
         throw new AuthError('invalid or expired refresh token', 401)
       }
@@ -134,5 +133,7 @@ export const authController = {
       await RefreshToken.findOneAndDelete({ token: refreshToken })
 
       await tokenResponse({ userId: data.userId, res })
-    }),
+    },
+    { cookies: z.object({ refreshToken: z.string() }) },
+  ),
 }
