@@ -2,6 +2,7 @@ import { Router } from 'express'
 import multer from 'multer'
 
 import { authController } from '../controller/auth'
+import { userController } from '../controller/user'
 
 const upload = multer()
 
@@ -37,7 +38,7 @@ router.use('/capsules', capsuleRouter)
 
 const userRouter = Router()
 
-userRouter.get('/:id')
+userRouter.get('/:id', userController.getUserById)
 userRouter.get('/me')
 userRouter.put('/me')
 userRouter.delete('/me')
