@@ -24,4 +24,19 @@ export const userController = {
       },
     },
   ),
+  getCurrentUser: handle(
+    async ({ res, userId }) => {
+      const user = await User.findById(
+        userId,
+        'username firstName lastName image email',
+      )
+
+      if (!user) {
+        throw new NotFoundError('user not found')
+      }
+
+      res.status(200).json(user)
+    },
+    { authenticate: true },
+  ),
 }
