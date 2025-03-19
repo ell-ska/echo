@@ -1,6 +1,7 @@
 import type { ZodError } from 'zod'
+import type { Response } from 'express'
 
-import type { Identifier } from './logger'
+import { logger, type Identifier } from './logger'
 
 export class NotFoundError extends Error {
   public status = 404
@@ -48,4 +49,32 @@ export class UnexpectedError extends Error {
     this.status = status
     this.identifier = identifier
   }
+}
+
+export const handleError = ({
+  error,
+  res,
+}: {
+  error: unknown
+  res: Response
+}) => {
+  if (
+    error instanceof ValidationError ||
+    error instanceof NotFoundError ||
+    error instanceof HandlerError ||
+    error instanceof AuthError
+  ) {
+    return res.status(error.status).json({ error: error.message })
+  }
+
+  if (error instanceof UnexpectedError) {
+    logger.error({ identifier: error.identifier, message: error.message })
+    return res.status(error.status).json({ error: error.message })
+  }
+
+  logger.error({
+    identifier: 'handler_unknown',
+    message: error instanceof Error ? error.message : 'unknown error',
+  })
+  return res.status(500).json({ error: 'something went wrong' })
 }

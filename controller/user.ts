@@ -1,18 +1,13 @@
 import { z } from 'zod'
 
-import { handler } from '../lib/handler'
+import { handle } from '../lib/handler'
 import { objectIdSchema } from '../lib/validation'
 import { User } from '../models/user'
 import { NotFoundError } from '../lib/errors'
 
 export const userController = {
-  getUserById: handler
-    .params(
-      z.object({
-        id: objectIdSchema,
-      }),
-    )
-    .execute(async ({ res, params: { id } }) => {
+  getUserById: handle(
+    async ({ res, params: { id } }) => {
       const user = await User.findById(id, 'username firstName lastName image')
 
       if (!user) {
@@ -20,5 +15,13 @@ export const userController = {
       }
 
       res.status(200).json(user)
-    }),
+    },
+    {
+      schemas: {
+        params: z.object({
+          id: objectIdSchema,
+        }),
+      },
+    },
+  ),
 }

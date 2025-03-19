@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { Types } from 'mongoose'
 
+import { ValidationError } from './errors'
+
 export const passwordSchema = z
   .string()
   .min(8, 'password must be at least 8 characters')
@@ -34,3 +36,20 @@ export const objectIdSchema = z.union([
       'invalid object id string',
     ),
 ])
+
+export const validate = <T>(
+  schema: z.Schema<T> | undefined,
+  values: unknown,
+): T | null => {
+  if (!schema) {
+    return null
+  }
+
+  const { success, error, data } = schema.safeParse(values)
+
+  if (!success) {
+    throw new ValidationError(error)
+  }
+
+  return data
+}
