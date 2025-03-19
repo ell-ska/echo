@@ -40,7 +40,7 @@ const userRouter = Router()
 
 userRouter.get('/me', userController.getCurrentUser)
 userRouter.put('/me', upload.single('image'), userController.editUser)
-userRouter.delete('/me')
+userRouter.delete('/me', userController.deleteUser)
 userRouter.get('/:id', userController.getUserById)
 
 router.use('/users', userRouter)

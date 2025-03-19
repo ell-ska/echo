@@ -76,4 +76,14 @@ export const userController = {
       },
     },
   ),
+  deleteUser: handle(
+    async ({ res, userId }) => {
+      await User.deleteOne({ _id: userId })
+
+      // TODO: delete potential image
+
+      res.status(204).send()
+    },
+    { authenticate: true },
+  ),
 }
