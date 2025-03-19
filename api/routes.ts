@@ -39,7 +39,7 @@ router.use('/capsules', capsuleRouter)
 const userRouter = Router()
 
 userRouter.get('/me', userController.getCurrentUser)
-userRouter.put('/me')
+userRouter.put('/me', upload.single('image'), userController.editUser)
 userRouter.delete('/me')
 userRouter.get('/:id', userController.getUserById)
 

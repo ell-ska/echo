@@ -1,6 +1,8 @@
 import { Schema, Types } from 'mongoose'
 import { z } from 'zod'
 
+import { objectIdSchema } from '../lib/validation'
+
 export const imageSchema = new Schema(
   {
     name: {
@@ -36,7 +38,7 @@ export const imageSchema = new Schema(
           }
 
           if (this.visibility === 'private') {
-            const schema = z.array(z.instanceof(Types.ObjectId)).min(1)
+            const schema = z.array(objectIdSchema).min(1)
             const { success } = schema.safeParse(accessibleBy)
             return success
           }
