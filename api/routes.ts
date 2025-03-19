@@ -38,9 +38,9 @@ router.use('/capsules', capsuleRouter)
 
 const userRouter = Router()
 
-userRouter.get('/:id', userController.getUserById)
 userRouter.get('/me', userController.getCurrentUser)
 userRouter.put('/me')
 userRouter.delete('/me')
+userRouter.get('/:id', userController.getUserById)
 
 router.use('/users', userRouter)
