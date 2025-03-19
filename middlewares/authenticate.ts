@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken'
+import type { Request } from 'express'
 
 import { AuthError } from '../lib/errors'
-import { HandlerRequest } from '../lib/handler'
 import { tokenSchema } from '../lib/validation'
 import { User } from '../models/user'
 
-export const authenticate = async (req: HandlerRequest) => {
+export const authenticate = async (req: Request) => {
   const authHeader = req.headers.authorization
   const accessToken = authHeader?.split(' ')[1]
 
