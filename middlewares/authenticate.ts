@@ -1,16 +1,11 @@
 import jwt from 'jsonwebtoken'
-import type { NextFunction } from 'express'
 
 import { AuthError } from '../lib/errors'
 import { HandlerRequest } from '../lib/handler'
 import { tokenSchema } from '../lib/validation'
 import { User } from '../models/user'
 
-export const authenticate = async (
-  req: HandlerRequest,
-  _: never,
-  next: NextFunction,
-) => {
+export const authenticate = async (req: HandlerRequest) => {
   const authHeader = req.headers.authorization
   const accessToken = authHeader?.split(' ')[1]
 
@@ -39,6 +34,5 @@ export const authenticate = async (
     throw new AuthError('user does not exist', 404)
   }
 
-  req.userId = data.userId
-  next()
+  return data.userId
 }

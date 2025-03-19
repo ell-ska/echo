@@ -1,22 +1,33 @@
 import z from 'zod'
 import { connection, mongo } from 'mongoose'
-import type { NextFunction, Request as ExpressRequest, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 
 import { validate } from './validation'
 import { handleError } from './errors'
+import { authenticate } from '../middlewares/authenticate'
 
-export type HandlerRequest = ExpressRequest & { userId?: string }
+type UserId<T extends boolean> = T extends true ? string : null
 
-type HandlerFunction<Params, Values, Cookies> = (args: {
-  req: HandlerRequest
+type HandlerArguments<
+  Params,
+  Values,
+  Cookies,
+  Authenticated extends boolean,
+> = {
+  req: Request
   params: Params
   res: Response
   values: Values
   cookies: Cookies
+  userId: UserId<Authenticated>
   next: NextFunction
-}) => Promise<void> | void
+}
 
-const upload = async (req: HandlerRequest) => {
+type HandlerFunction<Params, Values, Cookies, Authenticated extends boolean> = (
+  args: HandlerArguments<Params, Values, Cookies, Authenticated>,
+) => Promise<void> | void
+
+const upload = async (req: Request) => {
   const bucket = new mongo.GridFSBucket(connection.db!, {
     bucketName: 'images',
   })
@@ -58,33 +69,44 @@ export const handle = <
   Params extends unknown | null,
   Values extends unknown | null,
   Cookies extends unknown | null,
+  Authenticated extends boolean = false,
 >(
-  callback: HandlerFunction<Params, Values, Cookies>,
-  schemas?: {
-    params?: z.Schema<Params>
-    values?: z.Schema<Values>
-    cookies?: z.Schema<Cookies>
+  callback: HandlerFunction<Params, Values, Cookies, Authenticated>,
+  options?: {
+    schemas?: {
+      params?: z.Schema<Params>
+      values?: z.Schema<Values>
+      cookies?: z.Schema<Cookies>
+    }
+    authenticate?: Authenticated
   },
 ) => {
-  return async (req: HandlerRequest, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const params = validate(schemas?.params, req.params)
+      const userId = (
+        options?.authenticate ? await authenticate(req) : null
+      ) as UserId<Authenticated>
+
+      const params = validate(options?.schemas?.params, req.params)
 
       if (req.file || req.files) {
         await upload(req)
       }
 
-      const values = validate(schemas?.values, req.body)
-      const cookies = validate(schemas?.cookies, req.cookies)
+      const values = validate(options?.schemas?.values, req.body)
+      const cookies = validate(options?.schemas?.cookies, req.cookies)
 
-      await callback({
+      const args = {
         req,
         params: params as Params,
         res,
         values: values as Values,
         cookies: cookies as Cookies,
+        userId,
         next,
-      })
+      } satisfies HandlerArguments<Params, Values, Cookies, Authenticated>
+
+      await callback(args)
     } catch (error) {
       handleError({ error, res })
     }

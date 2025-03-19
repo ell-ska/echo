@@ -17,9 +17,11 @@ export const userController = {
       res.status(200).json(user)
     },
     {
-      params: z.object({
-        id: objectIdSchema,
-      }),
+      schemas: {
+        params: z.object({
+          id: objectIdSchema,
+        }),
+      },
     },
   ),
 }

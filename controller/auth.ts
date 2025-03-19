@@ -63,14 +63,16 @@ export const authController = {
       res.status(201).json({ message: 'user registered successfully' })
     },
     {
-      values: z.object({
-        username: usernameSchema,
-        firstName: z.string(),
-        lastName: z.string(),
-        email: z.string().email(),
-        password: passwordSchema,
-        image: imageSchema.optional(),
-      }),
+      schemas: {
+        values: z.object({
+          username: usernameSchema,
+          firstName: z.string(),
+          lastName: z.string(),
+          email: z.string().email(),
+          password: passwordSchema,
+          image: imageSchema.optional(),
+        }),
+      },
     },
   ),
   login: handle(
@@ -89,21 +91,26 @@ export const authController = {
       await tokenResponse({ userId: user._id, res })
     },
     {
-      values: z
-        .object({
-          username: z.string().optional(),
-          email: z.string().email().optional(),
-          password: z.string(),
-        })
-        .refine(({ username, email }) => username || email, {
-          message: 'either username or email must be provided',
-        }),
+      schemas: {
+        values: z
+          .object({
+            username: z.string().optional(),
+            email: z.string().email().optional(),
+            password: z.string(),
+          })
+          .refine(({ username, email }) => username || email, {
+            message: 'either username or email must be provided',
+          }),
+      },
     },
   ),
-  logout: handle(({ res }) => {
-    res.clearCookie('refreshToken', { httpOnly: true, secure: true })
-    res.status(200).json({ message: 'logged out' })
-  }),
+  logout: handle(
+    ({ res }) => {
+      res.clearCookie('refreshToken', { httpOnly: true, secure: true })
+      res.status(200).json({ message: 'logged out' })
+    },
+    { authenticate: true },
+  ),
   refreshToken: handle(
     async ({ res, cookies: { refreshToken } }) => {
       if (!(await RefreshToken.exists({ token: refreshToken }))) {
@@ -134,6 +141,6 @@ export const authController = {
 
       await tokenResponse({ userId: data.userId, res })
     },
-    { cookies: z.object({ refreshToken: z.string() }) },
+    { schemas: { cookies: z.object({ refreshToken: z.string() }) } },
   ),
 }
