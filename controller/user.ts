@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
 import { handle } from '../lib/handler'
-import { objectIdSchema } from '../lib/validation'
+import { imageSchema, objectIdSchema, usernameSchema } from '../lib/validation'
 import { User } from '../models/user'
-import { NotFoundError } from '../lib/errors'
+import { HandlerError, NotFoundError } from '../lib/errors'
 
 export const userController = {
   getUserById: handle(
@@ -38,5 +38,42 @@ export const userController = {
       res.status(200).json(user)
     },
     { authenticate: true },
+  ),
+  editUser: handle(
+    async ({
+      res,
+      values: { username, firstName, lastName, image },
+      userId,
+    }) => {
+      const userWithWantedUsername = await User.findOne({ username })
+      if (userWithWantedUsername) {
+        throw new HandlerError('username taken', 400)
+      }
+
+      await User.updateOne(
+        { _id: userId },
+        {
+          username,
+          firstName,
+          lastName,
+          image: image ? { ...image, visibility: 'public' } : undefined,
+        },
+      )
+
+      // TODO: delete image in case it is updated
+
+      res.status(204).send()
+    },
+    {
+      authenticate: true,
+      schemas: {
+        values: z.object({
+          username: usernameSchema.optional(),
+          firstName: z.string().optional(),
+          lastName: z.string().optional(),
+          image: imageSchema.optional(),
+        }),
+      },
+    },
   ),
 }
