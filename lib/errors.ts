@@ -43,9 +43,16 @@ export class AuthError extends Error {
 export class UnexpectedError extends Error {
   public status: number
   public identifier: Identifier
+  public publicMessage: string
 
-  constructor(message: string, status: number, identifier: Identifier) {
-    super(message)
+  constructor(
+    privateMessage: string,
+    publicMessage: string,
+    status: number,
+    identifier: Identifier,
+  ) {
+    super(privateMessage)
+    this.publicMessage = publicMessage
     this.status = status
     this.identifier = identifier
   }
@@ -69,7 +76,7 @@ export const handleError = ({
 
   if (error instanceof UnexpectedError) {
     logger.error({ identifier: error.identifier, message: error.message })
-    return res.status(error.status).json({ error: error.message })
+    return res.status(error.status).json({ error: error.publicMessage })
   }
 
   logger.error({

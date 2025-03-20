@@ -4,7 +4,7 @@ import { handle } from '../lib/handler'
 import { imageSchema, objectIdSchema, usernameSchema } from '../lib/validation'
 import { User } from '../models/user'
 import { HandlerError, NotFoundError } from '../lib/errors'
-import { deleteFile } from '../lib/deleteFile'
+import { deleteFile } from '../lib/file'
 
 export const userController = {
   getUserById: handle(
