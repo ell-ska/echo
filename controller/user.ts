@@ -4,6 +4,7 @@ import { handle } from '../lib/handler'
 import { imageSchema, objectIdSchema, usernameSchema } from '../lib/validation'
 import { User } from '../models/user'
 import { HandlerError, NotFoundError } from '../lib/errors'
+import { deleteFile } from '../lib/deleteFile'
 
 export const userController = {
   getUserById: handle(
@@ -50,17 +51,19 @@ export const userController = {
         throw new HandlerError('username taken', 400)
       }
 
-      await User.updateOne(
-        { _id: userId },
-        {
-          username,
-          firstName,
-          lastName,
-          image: image ? { ...image, visibility: 'public' } : undefined,
-        },
-      )
+      const user = (await User.findById(userId))!
+      const oldImage = user.image
 
-      // TODO: delete image in case it is updated
+      if (oldImage) {
+        await deleteFile(oldImage.name)
+      }
+
+      await user.updateOne({
+        username,
+        firstName,
+        lastName,
+        image: image ? { ...image, visibility: 'public' } : undefined,
+      })
 
       res.status(204).send()
     },
@@ -78,9 +81,13 @@ export const userController = {
   ),
   deleteUser: handle(
     async ({ res, userId }) => {
-      await User.deleteOne({ _id: userId })
+      const user = (await User.findById(userId))!
 
-      // TODO: delete potential image
+      if (user.image) {
+        await deleteFile(user.image.name)
+      }
+
+      await user.deleteOne()
 
       res.status(204).send()
     },

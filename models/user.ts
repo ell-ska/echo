@@ -2,7 +2,7 @@ import { InferSchemaType, model, MongooseError, Schema } from 'mongoose'
 import { z } from 'zod'
 import bcrypt from 'bcrypt'
 
-import { imageSchema } from '../schemas/image'
+import { ImageSchema, imageSchema } from '../schemas/image'
 import { logger } from '../lib/logger'
 
 const schema = new Schema(
@@ -76,4 +76,8 @@ schema.pre('save', async function (next) {
   }
 })
 
-export const User = model<InferSchemaType<typeof schema>>('User', schema)
+type UserSchema = Omit<InferSchemaType<typeof schema>, 'image'> & {
+  image: ImageSchema
+}
+
+export const User = model<UserSchema>('User', schema)
