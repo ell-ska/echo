@@ -58,3 +58,14 @@ export const imageSchema = new Schema(
     timestamps: true,
   },
 )
+
+// accessibleBy messes up the inference hence the manual declaration
+export type ImageSchema = {
+  name: string
+  type: string
+  size: number
+  visibility: 'public' | 'private'
+  createdAt: NativeDate
+  updatedAt: NativeDate
+  accessibleBy: Types.ObjectId[]
+}

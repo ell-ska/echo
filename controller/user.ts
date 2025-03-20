@@ -54,7 +54,7 @@ export const userController = {
       const user = (await User.findById(userId))!
       const oldImage = user.image
 
-      if (oldImage && 'name' in oldImage && typeof oldImage.name === 'string') {
+      if (oldImage) {
         await deleteFile(oldImage.name)
       }
 
@@ -82,10 +82,9 @@ export const userController = {
   deleteUser: handle(
     async ({ res, userId }) => {
       const user = (await User.findById(userId))!
-      const oldImage = user.image
 
-      if (oldImage && 'name' in oldImage && typeof oldImage.name === 'string') {
-        await deleteFile(oldImage.name)
+      if (user.image) {
+        await deleteFile(user.image.name)
       }
 
       await user.deleteOne()
