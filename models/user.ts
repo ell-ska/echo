@@ -77,7 +77,7 @@ schema.pre('save', async function (next) {
 })
 
 type UserSchema = Omit<InferSchemaType<typeof schema>, 'image'> & {
-  image: ImageSchema
+  image: ImageSchema | undefined
 }
 
 export const User = model<UserSchema>('User', schema)

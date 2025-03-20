@@ -44,5 +44,6 @@ userRouter.get('/me/image', imageController.getCurrentUserImage)
 userRouter.put('/me', upload.single('image'), userController.editUser)
 userRouter.delete('/me', userController.deleteUser)
 userRouter.get('/:id', userController.getUserById)
+userRouter.get('/:id/image', imageController.getUserImageById)
 
 router.use('/users', userRouter)
