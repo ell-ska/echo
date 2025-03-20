@@ -1,10 +1,10 @@
 import z from 'zod'
-import { connection, mongo } from 'mongoose'
 import type { NextFunction, Request, Response } from 'express'
 
 import { validate } from './validation'
 import { handleError } from './errors'
 import { authenticate } from '../middlewares/authenticate'
+import { getBucketConnection } from './file'
 
 type UserId<T extends boolean> = T extends true ? string : null
 
@@ -28,9 +28,7 @@ type HandlerFunction<Params, Values, Cookies, Authenticated extends boolean> = (
 ) => Promise<void> | void
 
 const upload = async (req: Request) => {
-  const bucket = new mongo.GridFSBucket(connection.db!, {
-    bucketName: 'images',
-  })
+  const bucket = getBucketConnection()
 
   const stream = async (file: Express.Multer.File) => {
     const uploadStream = bucket.openUploadStream(file.originalname)

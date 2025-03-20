@@ -3,6 +3,7 @@ import multer from 'multer'
 
 import { authController } from '../controller/auth'
 import { userController } from '../controller/user'
+import { imageController } from '../controller/image'
 
 const upload = multer()
 
@@ -39,6 +40,7 @@ router.use('/capsules', capsuleRouter)
 const userRouter = Router()
 
 userRouter.get('/me', userController.getCurrentUser)
+userRouter.get('/me/image', imageController.getCurrentUserImage)
 userRouter.put('/me', upload.single('image'), userController.editUser)
 userRouter.delete('/me', userController.deleteUser)
 userRouter.get('/:id', userController.getUserById)
