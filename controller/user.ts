@@ -62,7 +62,7 @@ export const userController = {
         username,
         firstName,
         lastName,
-        image: image ? { ...image, visibility: 'public' } : undefined,
+        image,
       })
 
       res.status(204).send()

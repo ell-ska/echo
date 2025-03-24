@@ -40,10 +40,13 @@ const schema = new Schema(
     },
     showCountdown: {
       type: Boolean,
+      required: true,
+      default: false,
     },
     visibility: {
       type: String,
       enum: ['public', 'private'],
+      required: true,
     },
     content: {
       type: String,
