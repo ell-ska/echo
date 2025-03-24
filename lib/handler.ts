@@ -7,25 +7,24 @@ import { handleError } from './errors'
 import { authenticate } from '../middlewares/authenticate'
 import { getBucketConnection } from './file'
 
-type UserId<T extends boolean> = T extends true ? Types.ObjectId : null
+type UserId<T> = T extends 'required'
+  ? Types.ObjectId
+  : T extends 'optional'
+    ? Types.ObjectId | null
+    : null
 
-type HandlerArguments<
-  Params,
-  Values,
-  Cookies,
-  Authenticated extends boolean,
-> = {
+type HandlerArguments<Params, Values, Cookies, UserId> = {
   req: Request
   params: Params
   res: Response
   values: Values
   cookies: Cookies
-  userId: UserId<Authenticated>
+  userId: UserId
   next: NextFunction
 }
 
-type HandlerFunction<Params, Values, Cookies, Authenticated extends boolean> = (
-  args: HandlerArguments<Params, Values, Cookies, Authenticated>,
+type HandlerFunction<Params, Values, Cookies, UserId> = (
+  args: HandlerArguments<Params, Values, Cookies, UserId>,
 ) => Promise<void> | void
 
 const upload = async (req: Request) => {
@@ -68,23 +67,25 @@ export const handle = <
   Params extends unknown | null,
   Values extends unknown | null,
   Cookies extends unknown | null,
-  Authenticated extends boolean = false,
+  Authentication extends 'required' | 'optional' | boolean = false,
 >(
-  callback: HandlerFunction<Params, Values, Cookies, Authenticated>,
+  callback: HandlerFunction<Params, Values, Cookies, UserId<Authentication>>,
   options?: {
     schemas?: {
       params?: z.Schema<Params>
       values?: z.Schema<Values>
       cookies?: z.Schema<Cookies>
     }
-    authenticate?: Authenticated
+    authentication?: Authentication
   },
 ) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userId = (
-        options?.authenticate ? await authenticate(req) : null
-      ) as UserId<Authenticated>
+      const userId = options?.authentication
+        ? options.authentication === 'required'
+          ? await authenticate(req, true)
+          : await authenticate(req, false)
+        : null
 
       const params = validate(options?.schemas?.params, req.params)
 
@@ -101,9 +102,14 @@ export const handle = <
         res,
         values: values as Values,
         cookies: cookies as Cookies,
-        userId,
+        userId: userId as UserId<Authentication>,
         next,
-      } satisfies HandlerArguments<Params, Values, Cookies, Authenticated>
+      } satisfies HandlerArguments<
+        Params,
+        Values,
+        Cookies,
+        UserId<Authentication>
+      >
 
       await callback(args)
     } catch (error) {

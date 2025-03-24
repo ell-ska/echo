@@ -69,7 +69,7 @@ export const imageController = {
       await imageResponse({ res, name: metadata.name, type: metadata.type })
     },
     {
-      authenticate: true,
+      authentication: 'required',
     },
   ),
 }

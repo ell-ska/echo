@@ -39,7 +39,7 @@ export const userController = {
 
       res.status(200).json(user)
     },
-    { authenticate: true },
+    { authentication: 'required' },
   ),
   editUser: handle(
     async ({
@@ -72,7 +72,7 @@ export const userController = {
       res.status(204).send()
     },
     {
-      authenticate: true,
+      authentication: 'required',
       schemas: {
         values: z.object({
           username: usernameSchema.optional(),
@@ -94,6 +94,6 @@ export const userController = {
       await user.deleteOne()
       res.status(204).send()
     },
-    { authenticate: true },
+    { authentication: 'required' },
   ),
 }

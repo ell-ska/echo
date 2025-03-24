@@ -111,7 +111,7 @@ export const authController = {
       res.clearCookie('refreshToken', { httpOnly: true, secure: true })
       res.status(200).json({ message: 'logged out' })
     },
-    { authenticate: true },
+    { authentication: 'required' },
   ),
   refreshToken: handle(
     async ({ res, cookies: { refreshToken } }) => {

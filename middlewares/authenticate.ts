@@ -6,12 +6,20 @@ import { AuthError } from '../lib/errors'
 import { tokenSchema } from '../lib/validation'
 import { User } from '../models/user'
 
-export const authenticate = async (req: Request) => {
+const handleError = (error: AuthError, shouldThrow: boolean) => {
+  if (shouldThrow) {
+    throw error
+  }
+
+  return null
+}
+
+export const authenticate = async (req: Request, shouldThrow: boolean) => {
   const authHeader = req.headers.authorization
   const accessToken = authHeader?.split(' ')[1]
 
   if (!accessToken) {
-    throw new AuthError('access token missing', 401)
+    return handleError(new AuthError('access token missing', 401), shouldThrow)
   }
 
   let decodedToken
@@ -22,17 +30,20 @@ export const authenticate = async (req: Request) => {
     const message =
       error instanceof Error ? error.message : 'invalid access token'
 
-    throw new AuthError(message, 401)
+    return handleError(new AuthError(message, 401), shouldThrow)
   }
 
   const { success, data } = tokenSchema.safeParse(decodedToken)
 
   if (!success) {
-    throw new AuthError('malformed access token', 401)
+    return handleError(
+      new AuthError('malformed access token', 401),
+      shouldThrow,
+    )
   }
 
   if (!(await User.exists({ _id: data.userId }))) {
-    throw new AuthError('user does not exist', 404)
+    return handleError(new AuthError('user does not exist', 404), shouldThrow)
   }
 
   const userObjectId = new Types.ObjectId(data.userId)
