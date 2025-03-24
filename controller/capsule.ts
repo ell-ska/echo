@@ -86,4 +86,24 @@ export const capsuleController = {
       },
     },
   ),
+  deleteCapsule: handle(
+    async ({ res, params: { id }, userId }) => {
+      const capsule = await Capsule.findById(id)
+
+      if (!capsule) {
+        throw new NotFoundError('capsule not found')
+      }
+
+      if (!capsule.isSentBy(userId)) {
+        throw new AuthError('you are not allowed to delete this capsule', 403)
+      }
+
+      await capsule.deleteOne()
+      res.status(204).send()
+    },
+    {
+      authenticate: true,
+      schemas: { params: z.object({ id: objectIdSchema }) },
+    },
+  ),
 }
