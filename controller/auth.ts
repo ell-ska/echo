@@ -57,7 +57,7 @@ export const authController = {
         lastName,
         email,
         password,
-        image: image ? { ...image, visibility: 'public' } : undefined,
+        image,
       })
 
       res.status(201).json({ message: 'user registered successfully' })

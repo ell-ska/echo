@@ -41,6 +41,27 @@ export const objectIdSchema = z.preprocess(
   Types.ObjectId
 >
 
+export const multipartFormBoolean = z.preprocess(
+  (value) => (typeof value === 'string' ? value === 'true' : false),
+  z.boolean(),
+) as z.ZodEffects<z.ZodBoolean, boolean, unknown>
+
+export const multipartFormObjectIdArray = z.preprocess(
+  (value) => (typeof value === 'string' ? JSON.parse(value) : value),
+  z.array(objectIdSchema).min(1),
+) as z.ZodEffects<
+  z.ZodArray<
+    z.ZodEffects<
+      z.ZodType<Types.ObjectId, z.ZodTypeDef, Types.ObjectId>,
+      Types.ObjectId,
+      Types.ObjectId
+    >,
+    'many'
+  >,
+  Types.ObjectId[],
+  Types.ObjectId[]
+>
+
 export const validate = <T>(
   schema: z.Schema<T> | undefined,
   values: unknown,

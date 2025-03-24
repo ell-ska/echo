@@ -3,6 +3,7 @@ import multer from 'multer'
 
 import { authController } from '../controller/auth'
 import { userController } from '../controller/user'
+import { capsuleController } from '../controller/capsule'
 import { imageController } from '../controller/image'
 
 const upload = multer()
@@ -24,7 +25,7 @@ router.use('/auth', authRouter)
 
 const capsuleRouter = Router()
 
-capsuleRouter.post('/')
+capsuleRouter.post('/', upload.array('images'), capsuleController.createCapsule)
 capsuleRouter.get('/public')
 capsuleRouter.get('/user/:id')
 capsuleRouter.get('/user/:id/recieved')
