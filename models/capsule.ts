@@ -1,4 +1,4 @@
-import { InferSchemaType, model, Schema } from 'mongoose'
+import { InferSchemaType, model, Schema, Types } from 'mongoose'
 
 import { imageSchema } from '../schemas/image'
 import { z } from 'zod'
@@ -74,8 +74,18 @@ schema.method('isUnlocked', function () {
   return this.unlockDate && this.unlockDate <= new Date()
 })
 
+schema.method('isSender', function (userId: Types.ObjectId) {
+  return this.senders.includes(userId)
+})
+
+schema.method('isReceiver', function (userId: Types.ObjectId) {
+  return this.receivers.includes(userId)
+})
+
 type CapsuleMethods = {
   isUnlocked: () => boolean
+  isSender: (userId: Types.ObjectId) => boolean
+  isReceiver: (userId: Types.ObjectId) => boolean
 }
 type CapsuleSchema = InferSchemaType<typeof schema>
 
