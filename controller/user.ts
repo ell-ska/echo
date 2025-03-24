@@ -5,6 +5,7 @@ import { imageSchema, objectIdSchema, usernameSchema } from '../lib/validation'
 import { User } from '../models/user'
 import { HandlerError, NotFoundError } from '../lib/errors'
 import { deleteFile } from '../lib/file'
+import { onlyDefinedValues } from '../lib/only-defined-values'
 
 export const userController = {
   getUserById: handle(
@@ -58,13 +59,16 @@ export const userController = {
         await deleteFile(oldImage.name)
       }
 
-      await user.updateOne({
-        username,
-        firstName,
-        lastName,
-        image,
-      })
+      user.set(
+        onlyDefinedValues({
+          username,
+          firstName,
+          lastName,
+          image,
+        }),
+      )
 
+      await user.save()
       res.status(204).send()
     },
     {
@@ -88,7 +92,6 @@ export const userController = {
       }
 
       await user.deleteOne()
-
       res.status(204).send()
     },
     { authenticate: true },

@@ -87,9 +87,8 @@ schema.method('isReceivedBy', function (userId: Types.ObjectId) {
 schema.pre('save', function (next) {
   if (!this.isModified('unlockDate')) {
     next()
+    return
   }
-
-  console.log('unlockDate modified')
 
   this.lockedAt = new Date()
   next()
