@@ -27,7 +27,7 @@ const capsuleRouter = Router()
 
 capsuleRouter.post('/', upload.array('images'), capsuleController.createCapsule)
 capsuleRouter.put('/:id', upload.array('images'), capsuleController.editCapsule)
-capsuleRouter.delete('/:id')
+capsuleRouter.delete('/:id', capsuleController.deleteCapsule)
 capsuleRouter.get('/:id')
 capsuleRouter.get('/public')
 capsuleRouter.get('/user/:id')
