@@ -70,22 +70,35 @@ const schema = new Schema(
   },
 )
 
-schema.method('isUnlocked', function () {
-  return this.unlockDate && this.unlockDate <= new Date()
+schema.method('getState', function () {
+  if (!this.unlockDate) return 'unsealed'
+  if (this.unlockDate && this.unlockDate >= new Date()) return 'sealed'
+  if (this.unlockDate && this.unlockDate <= new Date()) return 'opened'
 })
 
-schema.method('isSender', function (userId: Types.ObjectId) {
+schema.method('isSentBy', function (userId: Types.ObjectId) {
   return this.senders.includes(userId)
 })
 
-schema.method('isReceiver', function (userId: Types.ObjectId) {
+schema.method('isReceivedBy', function (userId: Types.ObjectId) {
   return this.receivers.includes(userId)
 })
 
+schema.pre('save', function (next) {
+  if (!this.isModified('unlockDate')) {
+    next()
+  }
+
+  console.log('unlockDate modified')
+
+  this.lockedAt = new Date()
+  next()
+})
+
 type CapsuleMethods = {
-  isUnlocked: () => boolean
-  isSender: (userId: Types.ObjectId) => boolean
-  isReceiver: (userId: Types.ObjectId) => boolean
+  getState: () => 'unsealed' | 'sealed' | 'opened'
+  isSentBy: (userId: Types.ObjectId) => boolean
+  isReceivedBy: (userId: Types.ObjectId) => boolean
 }
 type CapsuleSchema = InferSchemaType<typeof schema>
 
