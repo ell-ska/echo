@@ -1,10 +1,10 @@
+import { z } from 'zod'
 import type { Response } from 'express'
 
+import { User } from '../models/user'
 import { handle } from '../lib/handler'
 import { getBucketConnection, getFileId } from '../lib/file'
 import { NotFoundError, UnexpectedError } from '../lib/errors'
-import { User } from '../models/user'
-import { z } from 'zod'
 import { objectIdSchema } from '../lib/validation'
 
 const imageResponse = async ({

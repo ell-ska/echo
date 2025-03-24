@@ -1,4 +1,5 @@
 import z from 'zod'
+import { Types } from 'mongoose'
 import type { NextFunction, Request, Response } from 'express'
 
 import { validate } from './validation'
@@ -6,7 +7,7 @@ import { handleError } from './errors'
 import { authenticate } from '../middlewares/authenticate'
 import { getBucketConnection } from './file'
 
-type UserId<T extends boolean> = T extends true ? string : null
+type UserId<T extends boolean> = T extends true ? Types.ObjectId : null
 
 type HandlerArguments<
   Params,
