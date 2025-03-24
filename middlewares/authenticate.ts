@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import { Types } from 'mongoose'
 import type { Request } from 'express'
 
 import { AuthError } from '../lib/errors'
@@ -34,5 +35,7 @@ export const authenticate = async (req: Request) => {
     throw new AuthError('user does not exist', 404)
   }
 
-  return data.userId
+  const userObjectId = new Types.ObjectId(data.userId)
+
+  return userObjectId
 }

@@ -27,15 +27,19 @@ export const tokenSchema = z.object({
   userId: z.string(),
 })
 
-export const objectIdSchema = z.union([
+// preprocess sets the output type to unknown, hence the type assertion
+
+export const objectIdSchema = z.preprocess(
+  (value) =>
+    typeof value === 'string' && Types.ObjectId.isValid(value)
+      ? new Types.ObjectId(value)
+      : value,
   z.instanceof(Types.ObjectId),
-  z
-    .string()
-    .refine(
-      (value) => Types.ObjectId.isValid(value),
-      'invalid object id string',
-    ),
-])
+) as z.ZodEffects<
+  z.ZodType<Types.ObjectId, z.ZodTypeDef, Types.ObjectId>,
+  Types.ObjectId,
+  Types.ObjectId
+>
 
 export const validate = <T>(
   schema: z.Schema<T> | undefined,
