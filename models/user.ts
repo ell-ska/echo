@@ -53,6 +53,7 @@ const schema = new Schema(
 schema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next()
+    return
   }
 
   try {
@@ -63,6 +64,7 @@ schema.pre('save', async function (next) {
   } catch (error) {
     if (error instanceof MongooseError) {
       next(error)
+      return
     }
 
     if (error instanceof Error) {

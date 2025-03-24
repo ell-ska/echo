@@ -29,8 +29,9 @@ const tokenResponse = async ({
     expiresIn: '7d',
   })
 
-  await RefreshToken.insertOne({ token: refreshToken })
+  const databaseRefreshToken = new RefreshToken({ token: refreshToken })
 
+  await databaseRefreshToken.save()
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -51,7 +52,7 @@ export const authController = {
         throw new HandlerError('email or username already in use', 400)
       }
 
-      await User.create({
+      const user = new User({
         username,
         firstName,
         lastName,
@@ -60,6 +61,7 @@ export const authController = {
         image,
       })
 
+      await user.save()
       res.status(201).json({ message: 'user registered successfully' })
     },
     {

@@ -9,15 +9,17 @@ import {
   objectIdSchema,
 } from '../lib/validation'
 import { AuthError, HandlerError, NotFoundError } from '../lib/errors'
+import { onlyDefinedValues } from '../lib/only-defined-values'
 
 export const capsuleController = {
   createCapsule: handle(
     async ({ res, values: { collaborators, ...rest }, userId }) => {
-      const capsule = await Capsule.create({
+      const capsule = new Capsule({
         senders: [userId, ...(collaborators || [])],
         ...rest,
       })
 
+      await capsule.save()
       res.status(201).json({ id: capsule._id })
     },
     {
@@ -57,10 +59,12 @@ export const capsuleController = {
         throw new HandlerError('capsule is sealed and can not be edited', 423)
       }
 
-      capsule.set({
-        senders: [userId, ...(collaborators || [])],
-        ...rest,
-      })
+      capsule.set(
+        onlyDefinedValues({
+          senders: [userId, ...(collaborators || [])],
+          ...rest,
+        }),
+      )
 
       await capsule.save()
       res.status(204).send()
