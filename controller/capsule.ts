@@ -27,7 +27,7 @@ export const capsuleController = {
       schemas: {
         values: z.object({
           title: z.string().min(1),
-          unlockDate: z.string().datetime().optional(),
+          openDate: z.string().datetime().optional(),
           showCountdown: multipartFormBoolean.optional(),
           visibility: z.enum(['public', 'private']),
           content: z.string().optional(),
@@ -75,7 +75,7 @@ export const capsuleController = {
         params: z.object({ id: objectIdSchema }),
         values: z.object({
           title: z.string().min(1).optional(),
-          unlockDate: z.string().datetime().optional(),
+          openDate: z.string().datetime().optional(),
           showCountdown: multipartFormBoolean.optional(),
           visibility: z.enum(['public', 'private']).optional(),
           content: z.string().optional(),
