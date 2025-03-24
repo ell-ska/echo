@@ -3,24 +3,23 @@ import { InferSchemaType, model, Schema, Types } from 'mongoose'
 import { imageSchema } from '../schemas/image'
 import { z } from 'zod'
 
-const lockValidation = {
+const sealValidation = {
   validator: () => {
     const schema = z
       .object({
-        lockedAt: z.date().optional(),
-        unlockDate: z.date().optional(),
+        sealedAt: z.date().optional(),
+        openDate: z.date().optional(),
       })
       .refine((data) => {
         return (
-          (data.lockedAt && data.unlockDate) ||
-          (!data.lockedAt && !data.unlockDate)
+          (data.sealedAt && data.openDate) || (!data.sealedAt && !data.openDate)
         )
       })
 
     const { success } = schema.safeParse(this)
     return success
   },
-  message: 'document must have either both lockedAt and unlockDate, or neither',
+  message: 'document must have either both sealedAt and openDate, or neither',
 }
 
 const schema = new Schema(
@@ -30,13 +29,13 @@ const schema = new Schema(
       required: true,
       trim: true,
     },
-    lockedAt: {
+    sealedAt: {
       type: Date,
-      validate: lockValidation,
+      validate: sealValidation,
     },
-    unlockDate: {
+    openDate: {
       type: Date,
-      validate: lockValidation,
+      validate: sealValidation,
     },
     showCountdown: {
       type: Boolean,
@@ -71,9 +70,9 @@ const schema = new Schema(
 )
 
 schema.method('getState', function () {
-  if (!this.unlockDate) return 'unsealed'
-  if (this.unlockDate && this.unlockDate >= new Date()) return 'sealed'
-  if (this.unlockDate && this.unlockDate <= new Date()) return 'opened'
+  if (!this.openDate) return 'unsealed'
+  if (this.openDate && this.openDate >= new Date()) return 'sealed'
+  if (this.openDate && this.openDate <= new Date()) return 'opened'
 })
 
 schema.method('isSentBy', function (userId: Types.ObjectId) {
@@ -85,12 +84,12 @@ schema.method('isReceivedBy', function (userId: Types.ObjectId) {
 })
 
 schema.pre('save', function (next) {
-  if (!this.isModified('unlockDate')) {
+  if (!this.isModified('openDate')) {
     next()
     return
   }
 
-  this.lockedAt = new Date()
+  this.sealedAt = new Date()
   next()
 })
 
