@@ -1,6 +1,6 @@
 import { InferSchemaType, model, Schema } from 'mongoose'
 
-import { ImageSchema, imageSchema } from '../schemas/image'
+import { imageSchema } from '../schemas/image'
 import { z } from 'zod'
 
 const lockValidation = {
@@ -74,8 +74,6 @@ schema.method('isUnlocked', function () {
 type CapsuleMethods = {
   isUnlocked: () => boolean
 }
-type CapsuleSchema = Omit<InferSchemaType<typeof schema>, 'images'> & {
-  images: ImageSchema[]
-}
+type CapsuleSchema = InferSchemaType<typeof schema>
 
 export const Capsule = model<CapsuleSchema & CapsuleMethods>('Capsule', schema)
