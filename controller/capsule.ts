@@ -23,7 +23,7 @@ export const capsuleController = {
       res.status(201).json({ id: capsule._id })
     },
     {
-      authenticate: true,
+      authentication: 'required',
       schemas: {
         values: z.object({
           title: z.string().min(1),
@@ -70,7 +70,7 @@ export const capsuleController = {
       res.status(204).send()
     },
     {
-      authenticate: true,
+      authentication: 'required',
       schemas: {
         params: z.object({ id: objectIdSchema }),
         values: z.object({
@@ -102,7 +102,7 @@ export const capsuleController = {
       res.status(204).send()
     },
     {
-      authenticate: true,
+      authentication: 'required',
       schemas: { params: z.object({ id: objectIdSchema }) },
     },
   ),
