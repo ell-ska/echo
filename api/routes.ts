@@ -26,13 +26,13 @@ router.use('/auth', authRouter)
 const capsuleRouter = Router()
 
 capsuleRouter.post('/', upload.array('images'), capsuleController.createCapsule)
+capsuleRouter.put('/:id', upload.array('images'), capsuleController.editCapsule)
+capsuleRouter.delete('/:id')
+capsuleRouter.get('/:id')
 capsuleRouter.get('/public')
 capsuleRouter.get('/user/:id')
 capsuleRouter.get('/user/:id/recieved')
 capsuleRouter.get('/user/:id/sent')
-capsuleRouter.get('/:id')
-capsuleRouter.put('/:id')
-capsuleRouter.delete('/:id')
 
 router.use('/capsules', capsuleRouter)
 

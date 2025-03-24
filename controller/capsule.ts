@@ -6,34 +6,16 @@ import {
   imageSchema,
   multipartFormBoolean,
   multipartFormObjectIdArray,
+  objectIdSchema,
 } from '../lib/validation'
+import { AuthError, HandlerError, NotFoundError } from '../lib/errors'
 
 export const capsuleController = {
   createCapsule: handle(
-    async ({
-      res,
-      values: {
-        title,
-        unlockDate,
-        showCountdown,
-        visibility,
-        content,
-        images,
-        collaborators,
-        receivers,
-      },
-      userId,
-    }) => {
+    async ({ res, values: { collaborators, ...rest }, userId }) => {
       const capsule = await Capsule.create({
-        title,
-        unlockDate,
-        lockedAt: unlockDate ? new Date() : undefined,
-        showCountdown,
-        visibility,
-        content,
-        images: images,
         senders: [userId, ...(collaborators || [])],
-        receivers,
+        ...rest,
       })
 
       res.status(201).json({ id: capsule._id })
@@ -46,6 +28,52 @@ export const capsuleController = {
           unlockDate: z.string().datetime().optional(),
           showCountdown: multipartFormBoolean.optional(),
           visibility: z.enum(['public', 'private']),
+          content: z.string().optional(),
+          images: z.array(imageSchema).min(1).optional(),
+          collaborators: multipartFormObjectIdArray.optional(),
+          receivers: multipartFormObjectIdArray.optional(),
+        }),
+      },
+    },
+  ),
+  editCapsule: handle(
+    async ({
+      res,
+      params: { id },
+      values: { collaborators, ...rest },
+      userId,
+    }) => {
+      const capsule = await Capsule.findById(id)
+
+      if (!capsule) {
+        throw new NotFoundError('capsule not found')
+      }
+
+      if (!capsule.isSentBy(userId)) {
+        throw new AuthError('you are not allowed to edit this capsule', 403)
+      }
+
+      if (!(capsule.getState() === 'unsealed')) {
+        throw new HandlerError('capsule is sealed and can not be edited', 423)
+      }
+
+      capsule.set({
+        senders: [userId, ...(collaborators || [])],
+        ...rest,
+      })
+
+      await capsule.save()
+      res.status(204).send()
+    },
+    {
+      authenticate: true,
+      schemas: {
+        params: z.object({ id: objectIdSchema }),
+        values: z.object({
+          title: z.string().min(1).optional(),
+          unlockDate: z.string().datetime().optional(),
+          showCountdown: multipartFormBoolean.optional(),
+          visibility: z.enum(['public', 'private']).optional(),
           content: z.string().optional(),
           images: z.array(imageSchema).min(1).optional(),
           collaborators: multipartFormObjectIdArray.optional(),
