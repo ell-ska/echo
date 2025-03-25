@@ -13,9 +13,10 @@ type UserId<T> = T extends 'required'
     ? Types.ObjectId | null
     : null
 
-type HandlerArguments<Params, Values, Cookies, UserId> = {
+type HandlerArguments<Params, QueryParams, Values, Cookies, UserId> = {
   req: Request
   params: Params
+  queryParams: QueryParams
   res: Response
   values: Values
   cookies: Cookies
@@ -23,8 +24,8 @@ type HandlerArguments<Params, Values, Cookies, UserId> = {
   next: NextFunction
 }
 
-type HandlerFunction<Params, Values, Cookies, UserId> = (
-  args: HandlerArguments<Params, Values, Cookies, UserId>,
+type HandlerFunction<Params, QueryParams, Values, Cookies, UserId> = (
+  args: HandlerArguments<Params, QueryParams, Values, Cookies, UserId>,
 ) => Promise<void> | void
 
 const upload = async (req: Request) => {
@@ -65,14 +66,22 @@ const upload = async (req: Request) => {
 
 export const handle = <
   Params extends unknown | null,
+  QueryParams extends unknown | null,
   Values extends unknown | null,
   Cookies extends unknown | null,
   Authentication extends 'required' | 'optional' | boolean = false,
 >(
-  callback: HandlerFunction<Params, Values, Cookies, UserId<Authentication>>,
+  callback: HandlerFunction<
+    Params,
+    QueryParams,
+    Values,
+    Cookies,
+    UserId<Authentication>
+  >,
   options?: {
     schemas?: {
       params?: z.Schema<Params>
+      queryParams?: z.Schema<QueryParams>
       values?: z.Schema<Values>
       cookies?: z.Schema<Cookies>
     }
@@ -88,6 +97,7 @@ export const handle = <
         : null
 
       const params = validate(options?.schemas?.params, req.params)
+      const queryParams = validate(options?.schemas?.queryParams, req.query)
 
       if (req.file || req.files) {
         await upload(req)
@@ -99,6 +109,7 @@ export const handle = <
       const args = {
         req,
         params: params as Params,
+        queryParams: queryParams as QueryParams,
         res,
         values: values as Values,
         cookies: cookies as Cookies,
@@ -106,6 +117,7 @@ export const handle = <
         next,
       } satisfies HandlerArguments<
         Params,
+        QueryParams,
         Values,
         Cookies,
         UserId<Authentication>
