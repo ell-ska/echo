@@ -106,4 +106,110 @@ export const capsuleController = {
       schemas: { params: z.object({ id: objectIdSchema }) },
     },
   ),
+  getCapsuleById: handle(
+    async ({ res, params: { id }, userId }) => {
+      const capsule = await Capsule.findById(id)
+
+      if (!capsule) {
+        throw new NotFoundError('capsule not found')
+      }
+
+      const {
+        title,
+        content,
+        showCountdown,
+        openDate,
+        sealedAt,
+        visibility,
+        senders,
+        receivers,
+      } = capsule
+
+      const images = capsule.images.map((image) => ({
+        name: image.name,
+        type: image.type,
+      }))
+
+      const state = capsule.getState()
+
+      switch (state) {
+        case 'unsealed':
+          if (!userId || !capsule.isSentBy(userId)) {
+            throw new HandlerError(
+              'you are not allowed to access this capsule',
+              403,
+            )
+          }
+
+          res.status(200).json({
+            id,
+            title,
+            content,
+            images,
+            visibility,
+            showCountdown,
+            senders,
+            receivers,
+          })
+          break
+        case 'sealed':
+          if (
+            visibility === 'private' &&
+            (!userId || !capsule.isSentBy(userId))
+          ) {
+            throw new HandlerError(
+              'you are not allowed to access this capsule',
+              403,
+            )
+          }
+
+          if (
+            visibility === 'public' &&
+            (!userId || !capsule.isSentBy(userId)) &&
+            !showCountdown
+          ) {
+            throw new HandlerError(
+              'capsule is sealed and cannot be opened yet',
+              423,
+            )
+          }
+
+          res.status(200).json({
+            openDate,
+          })
+          break
+        case 'opened':
+          if (
+            visibility === 'private' &&
+            (!userId ||
+              (!capsule.isSentBy(userId) && !capsule.isReceivedBy(userId)))
+          ) {
+            throw new HandlerError(
+              'you are not allowed to access this capsule',
+              403,
+            )
+          }
+
+          res.status(200).json({
+            id,
+            title,
+            content,
+            images,
+            openDate,
+            sealedAt,
+            visibility,
+            showCountdown,
+            senders,
+            receivers,
+          })
+          break
+      }
+
+      res.status(500).send('capsule state not covered')
+    },
+    {
+      authentication: 'optional',
+      schemas: { params: z.object({ id: objectIdSchema }) },
+    },
+  ),
 }
