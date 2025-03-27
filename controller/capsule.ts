@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { Capsule } from '../models/capsule'
+import { Capsule, TCapsule } from '../models/capsule'
 import { handle } from '../lib/handler'
 import {
   imageSchema,
@@ -10,6 +10,60 @@ import {
 } from '../lib/validation'
 import { AuthError, HandlerError, NotFoundError } from '../lib/errors'
 import { onlyDefinedValues } from '../lib/only-defined-values'
+
+const filterCapsuleResponse = (
+  filter: 'unsealed' | 'sealed' | 'opened',
+  capsule: TCapsule,
+) => {
+  const {
+    _id,
+    title,
+    content,
+    showCountdown,
+    openDate,
+    sealedAt,
+    visibility,
+    senders,
+    receivers,
+  } = capsule
+
+  const images = capsule.images.map((image) => ({
+    name: image.name,
+    type: image.type,
+  }))
+
+  switch (filter) {
+    case 'unsealed':
+      return {
+        id: _id,
+        title,
+        content,
+        images,
+        visibility,
+        showCountdown,
+        senders,
+        receivers,
+      }
+    case 'sealed':
+      return {
+        id: _id,
+        openDate,
+      }
+    case 'opened':
+      return {
+        id: _id,
+        title,
+        content,
+        images,
+        openDate,
+        sealedAt,
+        visibility,
+        showCountdown,
+        senders,
+        receivers,
+      }
+  }
+}
 
 export const capsuleController = {
   createCapsule: handle(
@@ -114,22 +168,7 @@ export const capsuleController = {
         throw new NotFoundError('capsule not found')
       }
 
-      const {
-        title,
-        content,
-        showCountdown,
-        openDate,
-        sealedAt,
-        visibility,
-        senders,
-        receivers,
-      } = capsule
-
-      const images = capsule.images.map((image) => ({
-        name: image.name,
-        type: image.type,
-      }))
-
+      const { showCountdown, visibility } = capsule
       const state = capsule.getState()
 
       switch (state) {
@@ -141,17 +180,8 @@ export const capsuleController = {
             )
           }
 
-          res.status(200).json({
-            id,
-            title,
-            content,
-            images,
-            visibility,
-            showCountdown,
-            senders,
-            receivers,
-          })
-          break
+          res.status(200).json(filterCapsuleResponse('unsealed', capsule))
+          return
         case 'sealed':
           if (
             visibility === 'private' &&
@@ -174,10 +204,8 @@ export const capsuleController = {
             )
           }
 
-          res.status(200).json({
-            openDate,
-          })
-          break
+          res.status(200).json(filterCapsuleResponse('sealed', capsule))
+          return
         case 'opened':
           if (
             visibility === 'private' &&
@@ -190,26 +218,113 @@ export const capsuleController = {
             )
           }
 
-          res.status(200).json({
-            id,
-            title,
-            content,
-            images,
-            openDate,
-            sealedAt,
-            visibility,
-            showCountdown,
-            senders,
-            receivers,
-          })
-          break
+          res.status(200).json(filterCapsuleResponse('opened', capsule))
+          return
       }
-
-      res.status(500).send('capsule state not covered')
     },
     {
       authentication: 'optional',
       schemas: { params: z.object({ id: objectIdSchema }) },
+    },
+  ),
+  getUserCapsules: handle(
+    async ({ res, queryParams, userId }) => {
+      const draftFilter = {
+        senders: { $in: [userId] },
+        openDate: { $exists: false },
+      }
+
+      const sentFilter = {
+        senders: { $in: [userId] },
+        state: { $in: ['unsealed', 'opened'] },
+      }
+
+      const receivedFilter = {
+        receivers: { $in: [userId] },
+        state: 'opened',
+      }
+
+      const filters = {
+        default: {
+          $or: [sentFilter, receivedFilter, draftFilter],
+        },
+        draft: draftFilter,
+        sent: sentFilter,
+        received: receivedFilter,
+      }
+
+      const filter = filters[queryParams?.type || 'default']
+      const limit = queryParams?.take || 10
+      const skip = queryParams?.skip || 0
+
+      const capsules = await Capsule.aggregate([
+        {
+          $addFields: {
+            state: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $not: ['$openDate'] },
+                    then: 'unsealed',
+                  },
+                  {
+                    case: { $gte: ['$openDate', '$$NOW'] },
+                    then: 'sealed',
+                  },
+                  {
+                    case: { $lte: ['$openDate', '$$NOW'] },
+                    then: 'opened',
+                  },
+                ],
+              },
+            },
+            openDateDiff: {
+              $divide: [
+                { $subtract: ['$openDate', '$$NOW'] },
+                1000 * 60 * 60 * 24, // convert milliseconds to days
+              ],
+            },
+            hasOpenDate: {
+              $cond: { if: { $gt: ['$openDate', null] }, then: 1, else: 0 },
+            },
+          },
+        },
+        { $match: filter },
+        {
+          $sort: {
+            hasOpenDate: -1, // prioritize capsules with an open date
+            openDateDiff: 1,
+            sealedAt: -1,
+            createdAt: -1,
+          },
+        },
+        {
+          $skip: skip,
+        },
+        {
+          $limit: limit,
+        },
+      ])
+
+      res
+        .status(200)
+        .json(
+          capsules.map((capsule) =>
+            filterCapsuleResponse(capsule.state, capsule),
+          ),
+        )
+    },
+    {
+      authentication: 'required',
+      schemas: {
+        queryParams: z
+          .object({
+            type: z.enum(['draft', 'sent', 'received']).optional(),
+            take: z.coerce.number().min(1).optional(),
+            skip: z.coerce.number().min(1).optional(),
+          })
+          .optional(),
+      },
     },
   ),
 }
