@@ -23,6 +23,7 @@ const filterCapsuleResponse = (
     openDate,
     sealedAt,
     visibility,
+    state,
     senders,
     receivers,
   } = capsule
@@ -40,6 +41,7 @@ const filterCapsuleResponse = (
         content,
         images,
         visibility,
+        state,
         showCountdown,
         senders,
         receivers,
@@ -48,6 +50,7 @@ const filterCapsuleResponse = (
       return {
         id: _id,
         openDate,
+        state,
       }
     case 'opened':
       return {
@@ -58,6 +61,7 @@ const filterCapsuleResponse = (
         openDate,
         sealedAt,
         visibility,
+        state,
         showCountdown,
         senders,
         receivers,
@@ -109,7 +113,7 @@ export const capsuleController = {
         throw new AuthError('you are not allowed to edit this capsule', 403)
       }
 
-      if (!(capsule.getState() === 'unsealed')) {
+      if (!(capsule.state === 'unsealed')) {
         throw new HandlerError('capsule is sealed and can not be edited', 423)
       }
 
@@ -168,8 +172,7 @@ export const capsuleController = {
         throw new NotFoundError('capsule not found')
       }
 
-      const { showCountdown, visibility } = capsule
-      const state = capsule.getState()
+      const { showCountdown, visibility, state } = capsule
 
       switch (state) {
         case 'unsealed':
