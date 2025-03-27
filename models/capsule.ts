@@ -69,7 +69,7 @@ const schema = new Schema(
   },
 )
 
-schema.method('getState', function () {
+schema.virtual('state').get(function () {
   if (!this.openDate) return 'unsealed'
   if (this.openDate && this.openDate >= new Date()) return 'sealed'
   if (this.openDate && this.openDate <= new Date()) return 'opened'
@@ -94,12 +94,12 @@ schema.pre('save', function (next) {
 })
 
 type CapsuleMethods = {
-  getState: () => 'unsealed' | 'sealed' | 'opened'
   isSentBy: (userId: Types.ObjectId) => boolean
   isReceivedBy: (userId: Types.ObjectId) => boolean
 }
-type CapsuleSchema = InferSchemaType<typeof schema>
+type CapsuleSchema = InferSchemaType<typeof schema> & {
+  state: 'unsealed' | 'opened' | 'sealed'
+}
 
 export const Capsule = model<CapsuleSchema & CapsuleMethods>('Capsule', schema)
-
 export type TCapsule = CapsuleSchema & Document
