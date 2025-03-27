@@ -1,4 +1,4 @@
-import { InferSchemaType, model, Schema, Types } from 'mongoose'
+import { Document, InferSchemaType, model, Schema, Types } from 'mongoose'
 
 import { imageSchema } from '../schemas/image'
 import { z } from 'zod'
@@ -101,3 +101,5 @@ type CapsuleMethods = {
 type CapsuleSchema = InferSchemaType<typeof schema>
 
 export const Capsule = model<CapsuleSchema & CapsuleMethods>('Capsule', schema)
+
+export type TCapsule = CapsuleSchema & Document
