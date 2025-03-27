@@ -51,6 +51,8 @@ const filterCapsuleResponse = (
         id: _id,
         openDate,
         state,
+        senders,
+        receivers,
       }
     case 'opened':
       return {
@@ -234,12 +236,11 @@ export const capsuleController = {
     async ({ res, queryParams, userId }) => {
       const draftFilter = {
         senders: { $in: [userId] },
-        openDate: { $exists: false },
+        state: 'unsealed',
       }
 
       const sentFilter = {
         senders: { $in: [userId] },
-        state: { $in: ['unsealed', 'opened'] },
       }
 
       const receivedFilter = {
