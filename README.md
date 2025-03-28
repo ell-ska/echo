@@ -110,7 +110,7 @@ _retrieves publicly available capsules_
 
 #### request example
 
-```curl
+```bash
 curl --request GET \
   --url https://u05-rest-api.vercel.app/capsules/public
 ```
@@ -163,7 +163,7 @@ _retrieves capsules either sent by or received by the current user_
 
 #### request example
 
-```curl
+```bash
 curl --request GET \
   --url https://u05-rest-api.vercel.app/capsules/me \
   --header 'Authorization: bearer <access-token>'
@@ -231,7 +231,7 @@ publicly available capsules are available without authentication, for private ca
 
 #### request example
 
-```curl
+```bash
 curl --request GET \
   --url https://u05-rest-api.vercel.app/capsules/<id> \
   --header 'Authorization: bearer <access-token>'
@@ -281,7 +281,7 @@ publicly available capsule images are available without authentication, for priv
 
 #### request example
 
-```curl
+```bash
 curl --request GET \
   --url https://u05-rest-api.vercel.app/capsules/<id>/images/<image-name> \
   --header 'Authorization: bearer <access-token>'
@@ -329,7 +329,7 @@ authentication is required
 
 #### request example
 
-```curl
+```bash
 curl --request POST \
   --url https://u05-rest-api.vercel.app/capsules \
   --header 'Authorization: bearer <access-token>' \
@@ -389,7 +389,7 @@ authentication is required
 
 #### request example
 
-```curl
+```bash
 curl --request PUT \
   --url https://u05-rest-api.vercel.app/capsules/<id> \
   --header 'Authorization: bearer <access-token>' \
@@ -425,7 +425,7 @@ authentication is required
 
 #### request example
 
-```curl
+```bash
 curl --request DELETE \
   --url https://u05-rest-api.vercel.app/capsules/<id> \
   --header 'Authorization: bearer <access-token>' \
@@ -467,7 +467,7 @@ _register a new account_
 
 #### request example
 
-```curl
+```bash
 curl --request POST \
   --url https://u05-rest-api.vercel.app/auth/register \
   --header 'Content-Type: multipart/form-data' \
@@ -508,7 +508,7 @@ _authenticate a user_
 
 #### request example
 
-```curl
+```bash
 curl --request POST \
   --url https://u05-rest-api.vercel.app/auth/log-in \
   --header 'Content-Type: application/json' \
@@ -552,7 +552,7 @@ authentication is required
 
 #### request example
 
-```curl
+```bash
 curl --request DELETE \
   --url http://localhost:8000/auth/log-out \
   --header 'Authorization: bearer <access-token>' \
@@ -581,7 +581,7 @@ _request a new access token with the help of a refresh token_
 
 #### request example
 
-```curl
+```bash
 curl --request POST \
   --url https://u05-rest-api.vercel.app/auth/token/refresh \
   --cookie refreshToken=<refresh-token>
@@ -619,7 +619,7 @@ authentication is required
 
 #### request example
 
-```curl
+```bash
 curl --request GET \
   --url https://u05-rest-api.vercel.app/users/me \
   --header 'Authorization: bearer <access-token>'
@@ -651,7 +651,7 @@ _retrieve public information about a specific user_
 
 #### request example
 
-```curl
+```bash
 curl --request GET \
   --url https://u05-rest-api.vercel.app/users/<id>
 ```
@@ -685,7 +685,7 @@ authentication is required
 
 #### request example
 
-```curl
+```bash
 curl --request GET \
   --url https://u05-rest-api.vercel.app/users/me/image \
   --header 'Authorization: bearer <access-token>'
@@ -714,7 +714,7 @@ _retrieve a specific users profile picture_
 
 #### request example
 
-```curl
+```bash
 curl --request GET \
   --url https://u05-rest-api.vercel.app/users/<id>/image \
   --header 'Authorization: bearer <access-token>'
@@ -757,7 +757,7 @@ authentication is required
 
 #### request example
 
-```curl
+```bash
 curl --request PUT \
   --url https://u05-rest-api.vercel.app/users/me \
   --header 'Content-Type: application/json' \
@@ -785,7 +785,7 @@ authentication is required
 
 #### request example
 
-```curl
+```bash
 curl --request DELETE \
   --url https://u05-rest-api.vercel.app/users/me \
   --header 'Authorization: bearer <access-token>' \
