@@ -107,11 +107,20 @@ export const authController = {
     },
   ),
   logout: handle(
-    ({ res }) => {
+    async ({ res, cookies: { refreshToken } }) => {
+      if (!(await RefreshToken.exists({ token: refreshToken }))) {
+        throw new AuthError('invalid or expired refresh token', 401)
+      }
+
+      await RefreshToken.findOneAndDelete({ token: refreshToken })
       res.clearCookie('refreshToken', { httpOnly: true, secure: true })
+
       res.status(200).json({ message: 'logged out' })
     },
-    { authentication: 'required' },
+    {
+      authentication: 'required',
+      schemas: { cookies: z.object({ refreshToken: z.string() }) },
+    },
   ),
   refreshToken: handle(
     async ({ res, cookies: { refreshToken } }) => {
