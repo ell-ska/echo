@@ -4,8 +4,9 @@ import type { Response } from 'express'
 import { User } from '../models/user'
 import { handle } from '../lib/handler'
 import { getBucketConnection, getFileId } from '../lib/file'
-import { NotFoundError, UnexpectedError } from '../lib/errors'
+import { HandlerError, NotFoundError, UnexpectedError } from '../lib/errors'
 import { objectIdSchema } from '../lib/validation'
+import { Capsule } from '../models/capsule'
 
 const imageResponse = async ({
   res,
@@ -70,6 +71,61 @@ export const imageController = {
     },
     {
       authentication: 'required',
+    },
+  ),
+  getCapsuleImageByName: handle(
+    async ({ res, params: { id, name }, userId }) => {
+      const capsule = await Capsule.findById(id)
+      if (!capsule) {
+        throw new NotFoundError('capsule not found')
+      }
+
+      const { visibility, state } = capsule
+
+      const metadata = capsule.images?.find((image) => image.name === name)
+      if (!metadata) {
+        throw new NotFoundError('image not found')
+      }
+
+      switch (state) {
+        case 'unsealed':
+          if (!userId || !capsule.isSentBy(userId)) {
+            throw new HandlerError(
+              'you are not allowed to access this image',
+              403,
+            )
+          }
+
+          await imageResponse({ res, name: metadata.name, type: metadata.type })
+          return
+        case 'sealed':
+          throw new HandlerError(
+            'capsule is sealed, image cannot be accessed',
+            423,
+          )
+        case 'opened':
+          if (
+            visibility === 'private' &&
+            (!userId ||
+              (!capsule.isSentBy(userId) && !capsule.isReceivedBy(userId)))
+          ) {
+            throw new HandlerError(
+              'you are not allowed to access this image',
+              403,
+            )
+          }
+
+          await imageResponse({ res, name: metadata.name, type: metadata.type })
+      }
+    },
+    {
+      authentication: 'optional',
+      schemas: {
+        params: z.object({
+          id: objectIdSchema,
+          name: z.string(),
+        }),
+      },
     },
   ),
 }

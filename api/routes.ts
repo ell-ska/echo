@@ -29,6 +29,7 @@ capsuleRouter.post('/', upload.array('images'), capsuleController.createCapsule)
 capsuleRouter.get('/me', capsuleController.getUserCapsules)
 capsuleRouter.get('/public', capsuleController.getPublicCapsules)
 capsuleRouter.get('/:id', capsuleController.getCapsuleById)
+capsuleRouter.get('/:id/images/:name', imageController.getCapsuleImageByName)
 capsuleRouter.put('/:id', upload.array('images'), capsuleController.editCapsule)
 capsuleRouter.delete('/:id', capsuleController.deleteCapsule)
 
