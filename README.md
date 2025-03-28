@@ -61,9 +61,9 @@ echo uses conventional http response codes to indicate the success or failure of
 
 ### validation errors
 
-| status code | message                      | description                                      |
-| ----------- | ---------------------------- | ------------------------------------------------ |
-| 400         | array of formated zod errors | the user input did not follow the expected shape |
+| status code | message                       | description                                      |
+| ----------- | ----------------------------- | ------------------------------------------------ |
+| 400         | array of formatted zod errors | the user input did not follow the expected shape |
 
 ### general errors
 
@@ -72,6 +72,27 @@ echo uses conventional http response codes to indicate the success or failure of
 | 500         | something went wrong | this error is very rare and will only show for unexpected errors |
 
 ## endpoints
+
+- [capsules](#capsules)
+  - [get public capsules](#get-capsulespublic)
+  - [get current users capsules](#get-capsulesme)
+  - [get specific capsule](#get-capsulesid)
+  - [get capsule image](#get-capsulesidimagesname)
+  - [create capsule](#post-capsules)
+  - [edit specific capsule](#put-capsulesid)
+  - [delete specific capsule](#delete-capsulesid)
+- [auth](#auth)
+  - [register account](#post-authregister)
+  - [log in](#post-authlog-in)
+  - [log out](#delete-authlog-out)
+  - [refresh token](#post-tokenrefresh)
+- [users](#users)
+  - [get current user](#get-usersme)
+  - [get specific user](#get-usersid)
+  - [get current users image](#get-usersmeimage)
+  - [get specific users image](#get-usersidimage)
+  - [edit current user](#put-usersme)
+  - [delete current user](#delete-usersme)
 
 ## capsules
 
@@ -130,7 +151,7 @@ _200: OK_
 
 ### GET `/capsules/me`
 
-_retrieves capsules either sent by or recieved by the current user_
+_retrieves capsules either sent by or received by the current user_
 
 #### query parameters
 
@@ -196,6 +217,8 @@ _200: OK_
 
 ### GET `/capsules/:id`
 
+_retrieves information about a specific capsule_
+
 #### authentication
 
 publicly available capsules are available without authentication, for private capsules authentication is needed
@@ -243,6 +266,8 @@ _200: OK_
 
 ### GET `/capsules/:id/images/:name`
 
+_retrieves an image connected to a capsule_
+
 #### authentication
 
 publicly available capsule images are available without authentication, for private capsule images authentication is needed
@@ -276,6 +301,8 @@ _200: OK_
 | 423         | capsule is sealed, image cannot be accessed |
 
 ### POST `/capsules`
+
+_create a new capsule_
 
 #### authentication
 
@@ -328,6 +355,8 @@ _201: Created_
 ```
 
 ### PUT `/capsules/:id`
+
+_edit a specific capsule_
 
 #### authentication
 
@@ -382,6 +411,8 @@ _204: No Content_
 
 ### DELETE `/capsules/:id`
 
+_delete a specific capsules_
+
 #### authentication
 
 authentication is required
@@ -414,6 +445,8 @@ _204: No Content_
 ## auth
 
 ### POST `/auth/register`
+
+_register a new account_
 
 #### headers
 
@@ -457,6 +490,8 @@ _201: Created_
 | 400         | email or username already in use |
 
 ### POST `/auth/log-in`
+
+_authenticate a user_
 
 #### headers
 
@@ -503,6 +538,8 @@ a refresh token is set as an http only cookie
 
 ### DELETE `/auth/log-out`
 
+_log out a user_
+
 #### authentication
 
 authentication is required
@@ -533,6 +570,8 @@ _204: No Content_
 | 401         | invalid or expired refresh token |
 
 ### POST `/token/refresh`
+
+_request a new access token with the help of a refresh token_
 
 #### cookies
 
@@ -572,6 +611,8 @@ a refresh token is set as an http only cookie
 
 ### GET `/users/me`
 
+_retrieve information about the current user_
+
 #### authentication
 
 authentication is required
@@ -599,6 +640,8 @@ _200: OK_
 ```
 
 ### GET `/users/:id`
+
+_retrieve public information about a specific user_
 
 #### route parameters
 
@@ -634,6 +677,8 @@ _200: OK_
 
 ### GET `/users/me/image`
 
+_retrieve the current users profile picture_
+
 #### authentication
 
 authentication is required
@@ -658,6 +703,8 @@ _200: OK_
 | 404         | image not found |
 
 ### GET `/users/:id/image`
+
+_retrieve a specific users profile picture_
 
 #### route parameters
 
@@ -686,6 +733,8 @@ _200: OK_
 | 404         | image not found |
 
 ### PUT `/users/me`
+
+_edit the current user_
 
 #### authentication
 
@@ -727,6 +776,8 @@ _204: No Content_
 | 400         | username taken |
 
 ### DELETE `/users/me`
+
+_delete the current user_
 
 #### authentication
 
