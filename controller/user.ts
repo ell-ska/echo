@@ -10,13 +10,18 @@ import { onlyDefinedValues } from '../lib/only-defined-values'
 export const userController = {
   getUserById: handle(
     async ({ res, params: { id } }) => {
-      const user = await User.findById(id, 'username firstName lastName image')
+      const user = await User.findById(id)
 
       if (!user) {
         throw new NotFoundError('user not found')
       }
 
-      res.status(200).json(user)
+      res.status(200).json({
+        id: user._id,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      })
     },
     {
       schemas: {
@@ -28,16 +33,15 @@ export const userController = {
   ),
   getCurrentUser: handle(
     async ({ res, userId }) => {
-      const user = await User.findById(
-        userId,
-        'username firstName lastName image email',
-      )
+      const user = (await User.findById(userId))!
 
-      if (!user) {
-        throw new NotFoundError('user not found')
-      }
-
-      res.status(200).json(user)
+      res.status(200).json({
+        id: user._id,
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+      })
     },
     { authentication: 'required' },
   ),

@@ -62,7 +62,7 @@ export const authController = {
       })
 
       await user.save()
-      res.status(201).json({ message: 'user registered successfully' })
+      res.status(201).send()
     },
     {
       schemas: {
@@ -115,7 +115,7 @@ export const authController = {
       await RefreshToken.findOneAndDelete({ token: refreshToken })
       res.clearCookie('refreshToken', { httpOnly: true, secure: true })
 
-      res.status(200).json({ message: 'logged out' })
+      res.status(204).send()
     },
     {
       authentication: 'required',
