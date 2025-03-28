@@ -33,42 +33,105 @@ const filterCapsuleResponse = (
     type: image.type,
   }))
 
+  const commonFileds = {
+    id: _id,
+    visibility,
+    state,
+    senders,
+    receivers,
+  }
+
   switch (filter) {
     case 'unsealed':
       return {
-        id: _id,
+        ...commonFileds,
+        showCountdown,
         title,
         content,
         images,
-        visibility,
-        state,
-        showCountdown,
-        senders,
-        receivers,
       }
     case 'sealed':
       return {
-        id: _id,
+        ...commonFileds,
         openDate,
-        state,
-        senders,
-        receivers,
       }
     case 'opened':
       return {
-        id: _id,
+        ...commonFileds,
         title,
         content,
         images,
         openDate,
         sealedAt,
-        visibility,
-        state,
-        showCountdown,
-        senders,
-        receivers,
       }
   }
+}
+
+const getCapsules = async ({
+  filters,
+  queryParams,
+}: {
+  filters: {
+    [key: string]: object
+  }
+  queryParams?: {
+    type?: string
+    take?: number
+    skip?: number
+  }
+}) => {
+  const filter = filters[queryParams?.type || 'default']
+  const limit = queryParams?.take || 10
+  const skip = queryParams?.skip || 0
+
+  return await Capsule.aggregate([
+    {
+      $addFields: {
+        state: {
+          $switch: {
+            branches: [
+              {
+                case: { $not: ['$openDate'] },
+                then: 'unsealed',
+              },
+              {
+                case: { $gte: ['$openDate', '$$NOW'] },
+                then: 'sealed',
+              },
+              {
+                case: { $lte: ['$openDate', '$$NOW'] },
+                then: 'opened',
+              },
+            ],
+          },
+        },
+        openDateDiff: {
+          $divide: [
+            { $subtract: ['$openDate', '$$NOW'] },
+            1000 * 60 * 60 * 24, // convert milliseconds to days
+          ],
+        },
+        hasOpenDate: {
+          $cond: { if: { $gt: ['$openDate', null] }, then: 1, else: 0 },
+        },
+      },
+    },
+    { $match: filter },
+    {
+      $sort: {
+        hasOpenDate: -1, // prioritize capsules with an open date
+        openDateDiff: 1,
+        sealedAt: -1,
+        createdAt: -1,
+      },
+    },
+    {
+      $skip: skip,
+    },
+    {
+      $limit: limit,
+    },
+  ])
 }
 
 export const capsuleController = {
@@ -257,58 +320,7 @@ export const capsuleController = {
         received: receivedFilter,
       }
 
-      const filter = filters[queryParams?.type || 'default']
-      const limit = queryParams?.take || 10
-      const skip = queryParams?.skip || 0
-
-      const capsules = await Capsule.aggregate([
-        {
-          $addFields: {
-            state: {
-              $switch: {
-                branches: [
-                  {
-                    case: { $not: ['$openDate'] },
-                    then: 'unsealed',
-                  },
-                  {
-                    case: { $gte: ['$openDate', '$$NOW'] },
-                    then: 'sealed',
-                  },
-                  {
-                    case: { $lte: ['$openDate', '$$NOW'] },
-                    then: 'opened',
-                  },
-                ],
-              },
-            },
-            openDateDiff: {
-              $divide: [
-                { $subtract: ['$openDate', '$$NOW'] },
-                1000 * 60 * 60 * 24, // convert milliseconds to days
-              ],
-            },
-            hasOpenDate: {
-              $cond: { if: { $gt: ['$openDate', null] }, then: 1, else: 0 },
-            },
-          },
-        },
-        { $match: filter },
-        {
-          $sort: {
-            hasOpenDate: -1, // prioritize capsules with an open date
-            openDateDiff: 1,
-            sealedAt: -1,
-            createdAt: -1,
-          },
-        },
-        {
-          $skip: skip,
-        },
-        {
-          $limit: limit,
-        },
-      ])
+      const capsules = await getCapsules({ filters, queryParams })
 
       res
         .status(200)
@@ -324,6 +336,49 @@ export const capsuleController = {
         queryParams: z
           .object({
             type: z.enum(['draft', 'sent', 'received']).optional(),
+            take: z.coerce.number().min(1).optional(),
+            skip: z.coerce.number().min(1).optional(),
+          })
+          .optional(),
+      },
+    },
+  ),
+  getPublicCapsules: handle(
+    async ({ res, queryParams }) => {
+      const sealedFilter = {
+        visibility: 'public',
+        state: 'sealed',
+        showCountdown: true,
+      }
+
+      const openedFilter = {
+        visibility: 'public',
+        state: 'opened',
+      }
+
+      const filters = {
+        default: {
+          $or: [sealedFilter, openedFilter],
+        },
+        sealed: sealedFilter,
+        opened: openedFilter,
+      }
+
+      const capsules = await getCapsules({ filters, queryParams })
+
+      res
+        .status(200)
+        .json(
+          capsules.map((capsule) =>
+            filterCapsuleResponse(capsule.state, capsule),
+          ),
+        )
+    },
+    {
+      schemas: {
+        queryParams: z
+          .object({
+            type: z.enum(['sealed', 'opened']).optional(),
             take: z.coerce.number().min(1).optional(),
             skip: z.coerce.number().min(1).optional(),
           })
