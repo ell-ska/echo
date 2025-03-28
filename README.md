@@ -2,6 +2,16 @@
 
 echo lets you create and store digital time capsules, filled with text and images, to be unlocked at a future date. choose to keep your capsules private only accessible to select people or make them public for the world to discover. whether it’s a personal message to your future self, a surprise for a loved one, or a snapshot of the present for future generations, echo ensures your memories, thoughts, and moments stand the test of time.
 
+# getting started
+
+1. create an `.env` file following [`.env.example`](.env.example)
+
+2. (optionally) build and start the docker container with a local mongodb instance with `docker compose up -d`
+
+3. install dependencies with `npm i`
+
+4. start the development server: `npm run dev`
+
 # api reference
 
 ## introduction
