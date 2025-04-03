@@ -1,8 +1,8 @@
-import { connection, mongo, Types } from 'mongoose'
+import mongoose from 'mongoose'
 import { objectIdSchema, validate } from './validation'
 
 export const getBucketConnection = () => {
-  return new mongo.GridFSBucket(connection.db!, {
+  return new mongoose.mongo.GridFSBucket(mongoose.connection.db!, {
     bucketName: 'images',
   })
 }
@@ -11,7 +11,7 @@ export const getFileId = (name: string) => {
   const id = name.split('-')[0]
   validate(objectIdSchema, id)
 
-  return new Types.ObjectId(id)
+  return new mongoose.Types.ObjectId(id)
 }
 
 export const deleteFile = async (name: string) => {
