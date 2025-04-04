@@ -26,7 +26,7 @@ the echo api is organized around rest and has predictable resource oriented urls
 
 ### production
 
-`https://u05-rest-api.vercel.app/`
+`https://echo-ellskas-projects.vercel.app/`
 
 ## authentication
 
@@ -122,7 +122,7 @@ _retrieves publicly available capsules_
 
 ```bash
 curl --request GET \
-  --url https://u05-rest-api.vercel.app/capsules/public
+  --url https://echo-ellskas-projects.vercel.app/capsules/public
 ```
 
 #### response example
@@ -175,7 +175,7 @@ _retrieves capsules either sent by or received by the current user_
 
 ```bash
 curl --request GET \
-  --url https://u05-rest-api.vercel.app/capsules/me \
+  --url https://echo-ellskas-projects.vercel.app/capsules/me \
   --header 'Authorization: bearer <access-token>'
 ```
 
@@ -243,7 +243,7 @@ publicly available capsules are available without authentication, for private ca
 
 ```bash
 curl --request GET \
-  --url https://u05-rest-api.vercel.app/capsules/<id> \
+  --url https://echo-ellskas-projects.vercel.app/capsules/<id> \
   --header 'Authorization: bearer <access-token>'
 ```
 
@@ -293,7 +293,7 @@ publicly available capsule images are available without authentication, for priv
 
 ```bash
 curl --request GET \
-  --url https://u05-rest-api.vercel.app/capsules/<id>/images/<image-name> \
+  --url https://echo-ellskas-projects.vercel.app/capsules/<id>/images/<image-name> \
   --header 'Authorization: bearer <access-token>'
 ```
 
@@ -341,7 +341,7 @@ authentication is required
 
 ```bash
 curl --request POST \
-  --url https://u05-rest-api.vercel.app/capsules \
+  --url https://echo-ellskas-projects.vercel.app/capsules \
   --header 'Authorization: bearer <access-token>' \
   --header 'Content-Type: multipart/form-data' \
   --form 'title=Biggest Secret of 2025' \
@@ -401,7 +401,7 @@ authentication is required
 
 ```bash
 curl --request PUT \
-  --url https://u05-rest-api.vercel.app/capsules/<id> \
+  --url https://echo-ellskas-projects.vercel.app/capsules/<id> \
   --header 'Authorization: bearer <access-token>' \
   --header 'Content-Type: multipart/form-data' \
   --form openDate=2025-03-20T14:47:26.343Z
@@ -437,7 +437,7 @@ authentication is required
 
 ```bash
 curl --request DELETE \
-  --url https://u05-rest-api.vercel.app/capsules/<id> \
+  --url https://echo-ellskas-projects.vercel.app/capsules/<id> \
   --header 'Authorization: bearer <access-token>' \
 ```
 
@@ -479,7 +479,7 @@ _register a new account_
 
 ```bash
 curl --request POST \
-  --url https://u05-rest-api.vercel.app/auth/register \
+  --url https://echo-ellskas-projects.vercel.app/auth/register \
   --header 'Content-Type: multipart/form-data' \
   --form username=alexcarter \
   --form firstName=alex \
@@ -520,7 +520,7 @@ _authenticate a user_
 
 ```bash
 curl --request POST \
-  --url https://u05-rest-api.vercel.app/auth/log-in \
+  --url https://echo-ellskas-projects.vercel.app/auth/log-in \
   --header 'Content-Type: application/json' \
   --data '{
 	"username": "alexcarter",
@@ -593,7 +593,7 @@ _request a new access token with the help of a refresh token_
 
 ```bash
 curl --request POST \
-  --url https://u05-rest-api.vercel.app/auth/token/refresh \
+  --url https://echo-ellskas-projects.vercel.app/auth/token/refresh \
   --cookie refreshToken=<refresh-token>
 ```
 
@@ -631,7 +631,7 @@ authentication is required
 
 ```bash
 curl --request GET \
-  --url https://u05-rest-api.vercel.app/users/me \
+  --url https://echo-ellskas-projects.vercel.app/users/me \
   --header 'Authorization: bearer <access-token>'
 ```
 
@@ -663,7 +663,7 @@ _retrieve public information about a specific user_
 
 ```bash
 curl --request GET \
-  --url https://u05-rest-api.vercel.app/users/<id>
+  --url https://echo-ellskas-projects.vercel.app/users/<id>
 ```
 
 #### response example
@@ -697,7 +697,7 @@ authentication is required
 
 ```bash
 curl --request GET \
-  --url https://u05-rest-api.vercel.app/users/me/image \
+  --url https://echo-ellskas-projects.vercel.app/users/me/image \
   --header 'Authorization: bearer <access-token>'
 ```
 
@@ -726,7 +726,7 @@ _retrieve a specific users profile picture_
 
 ```bash
 curl --request GET \
-  --url https://u05-rest-api.vercel.app/users/<id>/image \
+  --url https://echo-ellskas-projects.vercel.app/users/<id>/image \
   --header 'Authorization: bearer <access-token>'
 ```
 
@@ -769,7 +769,7 @@ authentication is required
 
 ```bash
 curl --request PUT \
-  --url https://u05-rest-api.vercel.app/users/me \
+  --url https://echo-ellskas-projects.vercel.app/users/me \
   --header 'Content-Type: application/json' \
   --header 'Authorization: bearer <access-token>' \
   --form firstName=elias
@@ -797,7 +797,7 @@ authentication is required
 
 ```bash
 curl --request DELETE \
-  --url https://u05-rest-api.vercel.app/users/me \
+  --url https://echo-ellskas-projects.vercel.app/users/me \
   --header 'Authorization: bearer <access-token>' \
 ```
 
