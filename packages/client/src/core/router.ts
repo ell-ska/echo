@@ -1,7 +1,7 @@
 import { ComponentWithProps } from './component'
 
 type Params = Record<string, string>
-type Page = ComponentWithProps
+type Page = ComponentWithProps<{}>
 type RouteHandler = (params?: Params) => Page
 type Route = {
   path: string
