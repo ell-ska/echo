@@ -1,17 +1,20 @@
-export const createElement = <Tag extends keyof HTMLElementTagNameMap>(
+export const element = <Tag extends keyof HTMLElementTagNameMap>(
   tag: Tag,
-  {
-    props,
-    children,
-  }: {
-    props?: Partial<HTMLElementTagNameMap[Tag]>
-    children?: (Element | string)[]
+  options?: Partial<Omit<HTMLElementTagNameMap[Tag], 'children'>> & {
+    children?: (Element | string | null | undefined)[]
   }
 ): HTMLElementTagNameMap[Tag] => {
   const element = document.createElement(tag)
-  Object.assign(element, props)
+  if (!options) return element
 
-  children?.forEach((child) => {
+  const { children, ...attributes } = options
+  Object.assign(element, attributes)
+
+  if (!children) return element
+
+  children.forEach((child) => {
+    if (!child) return
+
     if (typeof child === 'string') {
       element.appendChild(document.createTextNode(child))
     } else {

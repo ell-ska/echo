@@ -1,5 +1,5 @@
 abstract class Base<Props = void> {
-  protected element: Element
+  public element: Element
   protected props: Props
 
   constructor(props: Props) {
@@ -7,7 +7,7 @@ abstract class Base<Props = void> {
     this.element = this.render(props)
   }
 
-  abstract render(props: Props): Element
+  protected abstract render(props: Props): Element
 
   mount(parent: Element) {
     parent.appendChild(this.element)
