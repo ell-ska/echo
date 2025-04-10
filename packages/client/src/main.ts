@@ -1,10 +1,11 @@
 import { Router } from './core/router'
+import { ExplorePage } from './pages/explore'
 import { TemporaryPage } from './pages/temporary'
 import './style.css'
 
 export const router = new Router({
   routes: {
-    '/': () => new TemporaryPage(),
+    '/': () => new ExplorePage(),
     '/sent': () => new TemporaryPage(),
     '/received': () => new TemporaryPage(),
     '/capsule/:id': () => new TemporaryPage(),
