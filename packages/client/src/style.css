@@ -9,3 +9,14 @@
 
   --font-sans: 'Albert Sans', sans-serif;
 }
+
+@layer base {
+  * {
+    @apply outline-offset-1 outline-primary-bright;
+  }
+
+  *:focus,
+  *:focus-visible {
+    @apply outline-1;
+  }
+}
