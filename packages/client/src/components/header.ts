@@ -18,7 +18,7 @@ export class Header extends Component {
 
     const header = element('header', {
       className:
-        'flex justify-between items-center max-w-5xl px-4 h-16 md:h-20',
+        'w-full flex justify-between items-center max-w-5xl px-4 h-16 md:h-20',
       children: [logo, button.element],
     })
 
