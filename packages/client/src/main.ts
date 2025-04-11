@@ -1,11 +1,13 @@
 import { Router } from './core/router'
+import { UnauthenticatedLayout } from './layouts/unauthenticated'
 import { ExplorePage } from './pages/explore'
 import { TemporaryPage } from './pages/temporary'
 import './style.css'
 
 export const router = new Router({
   routes: {
-    '/': () => new ExplorePage(),
+    '/': () =>
+      new UnauthenticatedLayout({ children: [new ExplorePage().element] }),
     '/sent': () => new TemporaryPage(),
     '/received': () => new TemporaryPage(),
     '/capsule/:id': () => new TemporaryPage(),

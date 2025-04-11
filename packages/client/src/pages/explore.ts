@@ -1,8 +1,8 @@
-import { Header } from '../components/header'
 import { Component } from '../core/component'
+import { element } from '../utils/element'
 
 export class ExplorePage extends Component {
   render() {
-    return new Header().element
+    return element('main', { innerText: 'explore', className: 'w-full' })
   }
 }
