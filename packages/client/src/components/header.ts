@@ -18,7 +18,7 @@ export class Header extends Component {
 
     const header = element('header', {
       className:
-        'w-full flex justify-between items-center max-w-5xl px-4 h-16 md:h-20',
+        'fixed z-50 w-full flex justify-between items-center max-w-5xl px-4 h-header-sm bg-slate-50/80 backdrop-blur-xs md:h-header-md',
       children: [logo, button.element],
     })
 
