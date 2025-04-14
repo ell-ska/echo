@@ -4,13 +4,9 @@ import jwt from 'jsonwebtoken'
 import type { Response } from 'express'
 import type { Types } from 'mongoose'
 
+import { registerSchema } from '@repo/validation/actions'
 import { handle } from '../lib/handler'
-import {
-  imageSchema,
-  passwordSchema,
-  tokenSchema,
-  usernameSchema,
-} from '../lib/validation'
+import { tokenSchema } from '../lib/validation'
 import { User } from '../models/user'
 import { AuthError, HandlerError } from '../lib/errors'
 import { RefreshToken } from '../models/refresh-token'
@@ -66,14 +62,7 @@ export const authController = {
     },
     {
       schemas: {
-        values: z.object({
-          username: usernameSchema,
-          firstName: z.string(),
-          lastName: z.string(),
-          email: z.string().email(),
-          password: passwordSchema,
-          image: imageSchema.optional(),
-        }),
+        values: registerSchema,
       },
     },
   ),
