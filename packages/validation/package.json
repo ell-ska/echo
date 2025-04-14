@@ -1,0 +1,17 @@
+{
+  "name": "@repo/validation",
+  "type": "module",
+  "exports": {
+    "./actions": "./src/actions.ts",
+    "./data": "./src/data.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "zod": "^3.24.2"
+  }
+}
