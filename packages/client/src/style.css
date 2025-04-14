@@ -8,6 +8,9 @@
   --color-warning-bright: #fa3927;
 
   --font-sans: 'Albert Sans', sans-serif;
+
+  --spacing-header-sm: calc(var(--spacing) * 16);
+  --spacing-header-md: calc(var(--spacing) * 20);
 }
 
 @layer base {
