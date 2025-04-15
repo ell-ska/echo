@@ -1,4 +1,4 @@
-import { ComponentWithProps } from '../core/component'
+import { Component } from '../core/component'
 import { cn } from '../utils/classnames'
 import { element } from '../utils/element'
 
@@ -13,8 +13,14 @@ type Props = {
   >
 >
 
-export class Input extends ComponentWithProps<Props> {
-  render({ label, error, name, ...attributes }: Props) {
+export class Input extends Component<Props> {
+  constructor(props: Props) {
+    super({ props })
+  }
+
+  render() {
+    const { label, error, name, ...attributes } = this.props
+
     const input = element('input', {
       ...attributes,
       name,

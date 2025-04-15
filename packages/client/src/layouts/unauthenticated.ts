@@ -1,13 +1,18 @@
 import { Header } from '../components/header'
-import { ComponentWithProps } from '../core/component'
+import { Component } from '../core/component'
 import { Child, element } from '../utils/element'
 
 type Props = {
   children: Child[]
 }
 
-export class UnauthenticatedLayout extends ComponentWithProps<Props> {
-  render({ children }: Props) {
+export class UnauthenticatedLayout extends Component<Props> {
+  constructor(props: Props) {
+    super({ props })
+  }
+
+  render() {
+    const { children } = this.props
     const header = new Header()
 
     const div = element('div', {

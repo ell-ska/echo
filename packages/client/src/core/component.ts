@@ -1,42 +1,33 @@
 import { type AxiosResponse, isAxiosError } from 'axios'
 import { z } from 'zod'
 
-abstract class Base<Props = void> {
+type Constructor<Props, State> = { props?: Props; state?: State }
+
+abstract class Base<Props = {}, State = {}> {
   public element!: Element
   protected props: Props
+  protected state: State
 
-  constructor(props: Props) {
-    this.props = props
+  constructor({ props, state }: Constructor<Props, State>) {
+    this.props = props || ({} as Props)
+    this.state = state || ({} as State)
   }
 
-  protected abstract render(props: Props): Element
-
-  mount(parent: Element) {
-    parent.appendChild(this.element)
-  }
+  protected abstract render(): Element
 
   protected rerender() {
-    const rerenderedElement = this.render(this.props)
+    const rerenderedElement = this.render()
     this.element.replaceWith(rerenderedElement)
     this.element = rerenderedElement
   }
 
-  update?(updatedProps: Partial<Props>): void
-}
-
-export abstract class Component extends Base {
-  constructor() {
-    super()
-    this.element = this.render()
+  protected setState(partialState: Partial<State>) {
+    this.state = { ...this.state, ...partialState }
+    this.rerender()
   }
 
-  abstract override render(): Element
-}
-
-export abstract class ComponentWithProps<Props extends {}> extends Base<Props> {
-  constructor(props: Props) {
-    super(props)
-    this.element = this.render(this.props)
+  mount(parent: Element) {
+    parent.appendChild(this.element)
   }
 
   update(updatedProps: Partial<Props>) {
@@ -45,13 +36,27 @@ export abstract class ComponentWithProps<Props extends {}> extends Base<Props> {
   }
 }
 
-export abstract class ComponentWithData<Data> extends Base {
+export abstract class Component<
+  Props extends {} = {},
+  State extends {} = {},
+> extends Base<Props, State> {
+  constructor({ props, state }: Constructor<Props, State>) {
+    super({ props, state })
+    this.element = this.render()
+  }
+}
+
+export abstract class ComponentWithData<
+  Data,
+  Props extends {} = {},
+  State extends {} = {},
+> extends Component<Props, State> {
   protected data: Data | null = null
   protected isLoading = true
   protected error: string | null = null
 
-  constructor() {
-    super()
+  constructor({ props, state }: Constructor<Props, State>) {
+    super({ props, state })
     // this cannot be called in Base because the initialization order will make scoped variables be undefined in the first render
     this.element = this.render()
     this.get()
