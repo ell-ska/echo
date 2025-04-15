@@ -1,5 +1,5 @@
 import { type AxiosResponse, isAxiosError } from 'axios'
-import { z } from 'zod'
+import { z, ZodFormattedError } from 'zod'
 
 type Constructor<Props, State> = { props?: Props; state?: State }
 
@@ -93,4 +93,68 @@ export abstract class ComponentWithData<
 
   protected abstract schema(): z.Schema<Data>
   protected abstract query(): Promise<AxiosResponse<Data, any>>
+}
+
+export abstract class ComponentWithMutation<
+  Values = void,
+  Props extends {} = {},
+  State extends {} = {},
+> extends Base<Props, State> {
+  protected isLoading = false
+  protected validationErrors: ZodFormattedError<Values> | null = null
+  protected error: string | null = null
+  protected values: Partial<Values> = {}
+
+  constructor({ props, state }: Constructor<Props, State>) {
+    super({ props, state })
+    this.element = this.render()
+  }
+
+  protected async mutate(values?: Values extends void ? never : object) {
+    try {
+      this.isLoading = true
+
+      if (!values) {
+        await this.mutation()
+        this.error = null
+        return
+      }
+
+      if (!this.schema) {
+        throw new Error(
+          'a mutation with values needs a schema to validate the values'
+        )
+      }
+
+      this.values = values
+      const { data, success, error } = this.schema().safeParse(values)
+
+      if (!success) {
+        this.validationErrors = error.format()
+        return
+      }
+
+      await this.mutation(data)
+
+      this.validationErrors = null
+      this.error = null
+    } catch (error) {
+      if (isAxiosError(error) && error.response?.data.error) {
+        this.error = error.response?.data.error
+        this.onError?.(error.response?.data.error)
+        return
+      }
+
+      const defaultMessage = 'something went wrong'
+      this.error = defaultMessage
+      this.onError?.(defaultMessage)
+    } finally {
+      this.isLoading = false
+      this.rerender()
+    }
+  }
+
+  protected abstract mutation(values?: Values): Promise<void>
+  protected schema?(): z.Schema<Values>
+  protected onError?(message: string): void
 }
