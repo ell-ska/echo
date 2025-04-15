@@ -11,6 +11,8 @@
 
   --spacing-header-sm: calc(var(--spacing) * 16);
   --spacing-header-md: calc(var(--spacing) * 20);
+
+  --shadow-float: 0 8px 32px #27272a1f;
 }
 
 @layer base {

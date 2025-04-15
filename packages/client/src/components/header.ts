@@ -22,7 +22,7 @@ export class Header extends Component {
 
     const header = element('header', {
       className:
-        'fixed z-50 w-full flex justify-between items-center max-w-5xl px-4 h-header-sm bg-slate-50/80 backdrop-blur-xs md:h-header-md',
+        'fixed z-40 w-full flex justify-between items-center max-w-5xl px-4 h-header-sm bg-slate-50/80 backdrop-blur-xs md:h-header-md',
       children: [logo, button.element],
     })
 
