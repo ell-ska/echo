@@ -1,3 +1,4 @@
+import { Toaster } from './components/toaster'
 import { Router } from './core/router'
 import { UnauthenticatedLayout } from './layouts/unauthenticated'
 import { ExplorePage } from './pages/explore'
@@ -21,3 +22,6 @@ export const router = new Router({
   outletSelector: '#app',
   notFoundHandler: () => new TemporaryPage(),
 })
+
+const toaster = new Toaster()
+toaster.mount(document.body)
