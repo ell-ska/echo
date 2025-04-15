@@ -44,6 +44,7 @@ type Props = {
   size?: 'sm' | 'md'
   href?: string
   onClick?: (event: MouseEvent) => void
+  type?: HTMLButtonElement['type']
 }
 
 export class Button extends Component<Props> {
@@ -88,6 +89,7 @@ export class Button extends Component<Props> {
     const button = element('button', {
       children,
       className,
+      type,
     })
 
     if (onClick) {
