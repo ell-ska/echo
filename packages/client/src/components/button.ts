@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority'
 import { createElement, type IconNode } from 'lucide'
 
-import { ComponentWithProps } from '../core/component'
+import { Component } from '../core/component'
 import { element } from '../utils/element'
 import { cn } from '../utils/classnames'
 
@@ -44,17 +44,25 @@ type Props = {
   size?: 'sm' | 'md'
   href?: string
   onClick?: (event: MouseEvent) => void
+  type?: HTMLButtonElement['type']
 }
 
-export class Button extends ComponentWithProps<Props> {
-  render({
-    label,
-    icon: iconNode,
-    variant = 'primary',
-    size = 'md',
-    href,
-    onClick,
-  }: Props) {
+export class Button extends Component<Props> {
+  constructor(props: Props) {
+    super({ props })
+  }
+
+  render() {
+    const {
+      label,
+      icon: iconNode,
+      variant = 'primary',
+      size = 'md',
+      href,
+      onClick,
+      type,
+    } = this.props
+
     const span = label
       ? element('span', {
           innerText: label,
@@ -81,6 +89,7 @@ export class Button extends ComponentWithProps<Props> {
     const button = element('button', {
       children,
       className,
+      type,
     })
 
     if (onClick) {

@@ -3,6 +3,10 @@ import { Component } from '../core/component'
 import { element } from '../utils/element'
 
 export class Header extends Component {
+  constructor() {
+    super({})
+  }
+
   render() {
     const logo = element('a', {
       innerText: 'echo',
