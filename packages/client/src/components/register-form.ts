@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { registerSchema } from '@repo/validation/actions'
+import { registerActionSchema } from '@repo/validation/actions'
 import { ComponentWithMutation } from '../core/component'
 import { element } from '../utils/element'
 import { client } from '../lib/client'
@@ -9,7 +9,7 @@ import { Button } from '../components/button'
 import { Input } from '../components/input'
 import { Toaster } from '../components/toaster'
 
-const schema = registerSchema
+const schema = registerActionSchema
   .merge(z.object({ confirm: z.string() }))
   .refine(({ password, confirm }) => password === confirm, {
     message: 'passwords do not match',
