@@ -4,8 +4,8 @@ import { imageSchema, passwordSchema, usernameSchema } from './partials'
 
 export const registerActionSchema = z.object({
   username: usernameSchema,
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
+  firstName: z.string().min(1).optional(),
+  lastName: z.string().min(1).optional(),
   email: z.string().email(),
   password: passwordSchema,
   image: imageSchema.optional(),
@@ -13,9 +13,9 @@ export const registerActionSchema = z.object({
 
 export const loginActionSchema = z
   .object({
-    username: z.string().optional(),
+    username: z.string().min(1).optional(),
     email: z.string().email().optional(),
-    password: z.string(),
+    password: z.string().min(1),
   })
   .refine(({ username, email }) => username || email, {
     message: 'either username or email must be provided',

@@ -96,21 +96,22 @@ export abstract class ComponentWithData<
 }
 
 export abstract class ComponentWithMutation<
-  Values = void,
+  Input = void,
+  Output = Input,
   Props extends {} = {},
   State extends {} = {},
 > extends Base<Props, State> {
   protected isLoading = false
-  protected validationErrors: ZodFormattedError<Values> | null = null
+  protected validationErrors: ZodFormattedError<Input> | null = null
   protected error: string | null = null
-  protected values: Partial<Values> = {}
+  protected values: Partial<Input> = {}
 
   constructor({ props, state }: Constructor<Props, State>) {
     super({ props, state })
     this.element = this.render()
   }
 
-  protected async mutate(values?: Values extends void ? never : object) {
+  protected async mutate(values?: Input extends void ? never : object) {
     try {
       this.isLoading = true
 
@@ -154,7 +155,7 @@ export abstract class ComponentWithMutation<
     }
   }
 
-  protected abstract mutation(values?: Values): Promise<void>
-  protected schema?(): z.Schema<Values>
+  protected abstract mutation(values?: Output): Promise<void>
+  protected schema?(): z.ZodType<Output, any, Input>
   protected onError?(message: string): void
 }
