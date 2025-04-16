@@ -2,6 +2,7 @@ import { Toaster } from './components/toaster'
 import { Router } from './core/router'
 import { UnauthenticatedLayout } from './layouts/unauthenticated'
 import { ExplorePage } from './pages/explore'
+import { LogInPage } from './pages/log-in'
 import { RegisterPage } from './pages/register'
 import { TemporaryPage } from './pages/temporary'
 import './style.css'
@@ -21,7 +22,10 @@ export const router = new Router({
       new UnauthenticatedLayout({
         children: [new RegisterPage().element],
       }),
-    '/auth/log-in': () => new TemporaryPage(),
+    '/auth/log-in': () =>
+      new UnauthenticatedLayout({
+        children: [new LogInPage().element],
+      }),
   },
   outletSelector: '#app',
   notFoundHandler: () => new TemporaryPage(),
