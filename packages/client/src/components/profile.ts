@@ -31,7 +31,7 @@ export class Profile extends Component<Props> {
         className: cn(
           commonClasses,
           sizeClasses,
-          'bg-primary-subtle flex items-center justify-center text-primary-bright'
+          'bg-primary-subtle flex items-center justify-center text-primary-bright uppercase'
         ),
       })
     }
