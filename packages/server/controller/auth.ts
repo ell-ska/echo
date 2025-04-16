@@ -4,7 +4,10 @@ import jwt from 'jsonwebtoken'
 import type { Response } from 'express'
 import type { Types } from 'mongoose'
 
-import { registerSchema } from '@repo/validation/actions'
+import {
+  loginActionSchema,
+  registerActionSchema,
+} from '@repo/validation/actions'
 import { handle } from '../lib/handler'
 import { tokenSchema } from '../lib/validation'
 import { User } from '../models/user'
@@ -62,7 +65,7 @@ export const authController = {
     },
     {
       schemas: {
-        values: registerSchema,
+        values: registerActionSchema,
       },
     },
   ),
@@ -83,15 +86,7 @@ export const authController = {
     },
     {
       schemas: {
-        values: z
-          .object({
-            username: z.string().optional(),
-            email: z.string().email().optional(),
-            password: z.string(),
-          })
-          .refine(({ username, email }) => username || email, {
-            message: 'either username or email must be provided',
-          }),
+        values: loginActionSchema,
       },
     },
   ),
