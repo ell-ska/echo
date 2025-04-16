@@ -1,14 +1,14 @@
 import { z } from 'zod'
 
-import { imageSchema, passwordSchema, usernameSchema } from './partials'
+import { image, password, username } from './partials'
 
 export const registerActionSchema = z.object({
-  username: usernameSchema,
+  username: username,
   firstName: z.string().min(1).optional(),
   lastName: z.string().min(1).optional(),
   email: z.string().email(),
-  password: passwordSchema,
-  image: imageSchema.optional(),
+  password: password,
+  image: image.optional(),
 })
 
 export type RegisterValues = z.infer<typeof registerActionSchema>

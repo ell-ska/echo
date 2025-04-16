@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const passwordSchema = z
+export const password = z
   .string()
   .min(8, 'password must be at least 8 characters')
   .max(20, 'password cannot be longer than 20 characters')
@@ -9,13 +9,15 @@ export const passwordSchema = z
   .regex(/\d/, 'password must contain at least one digit')
   .regex(/[!@#$%^&*]/, 'password must contain at least one special character')
 
-export const usernameSchema = z
+export const username = z
   .string()
   .min(3, 'username must be at least 3 characters')
   .max(30, 'username cannot be longer than 30 characters')
 
-export const imageSchema = z.object({
+export const image = z.object({
   name: z.string(),
   type: z.string(),
   size: z.number(),
 })
+
+export const id = z.coerce.string()
