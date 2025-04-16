@@ -11,6 +11,8 @@ export const registerActionSchema = z.object({
   image: imageSchema.optional(),
 })
 
+export type RegisterValues = z.infer<typeof registerActionSchema>
+
 export const loginActionSchema = z
   .object({
     username: z.string().min(1).optional(),

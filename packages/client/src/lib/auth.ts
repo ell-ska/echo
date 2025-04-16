@@ -1,4 +1,4 @@
-import { type LoginValues } from '@repo/validation/actions'
+import type { RegisterValues, LoginValues } from '@repo/validation/actions'
 import { tokenResponseSchema } from '@repo/validation/data'
 import { client } from './client'
 
@@ -14,11 +14,22 @@ class Auth {
     return this.accessToken
   }
 
-  async logIn(values: LoginValues) {
-    const response = await client.post('/auth/log-in', values)
+  private async fetch(
+    path: '/log-in' | '/register',
+    values: LoginValues | RegisterValues
+  ) {
+    const response = await client.post(`/auth${path}`, values)
 
     const { accessToken } = tokenResponseSchema.parse(response.data)
     this.setAccessToken(accessToken)
+  }
+
+  async register(values: RegisterValues) {
+    await this.fetch('/register', values)
+  }
+
+  async logIn(values: LoginValues) {
+    await this.fetch('/log-in', values)
   }
 
   async logOut() {

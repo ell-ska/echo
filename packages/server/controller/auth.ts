@@ -17,9 +17,11 @@ import { RefreshToken } from '../models/refresh-token'
 const tokenResponse = async ({
   userId,
   res,
+  status = 200,
 }: {
   userId: Types.ObjectId | string
   res: Response
+  status?: 200 | 201
 }) => {
   const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET!, {
     expiresIn: '15m',
@@ -35,7 +37,7 @@ const tokenResponse = async ({
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
   })
-  res.status(200).json({ accessToken })
+  res.status(status).json({ accessToken })
 }
 
 export const authController = {
@@ -61,7 +63,7 @@ export const authController = {
       })
 
       await user.save()
-      res.status(201).send()
+      await tokenResponse({ userId: user._id, res, status: 201 })
     },
     {
       schemas: {
