@@ -8,63 +8,53 @@ import {
   multipartFormObjectIdArray,
   objectIdSchema,
 } from '../lib/validation'
-import { AuthError, HandlerError, NotFoundError } from '../lib/errors'
+import {
+  AuthError,
+  HandlerError,
+  NotFoundError,
+  ValidationError,
+} from '../lib/errors'
 import { onlyDefinedValues } from '../lib/only-defined-values'
+import { capsuleResponseSchema } from '@repo/validation/data'
 
-const filterCapsuleResponse = (
-  filter: 'unsealed' | 'sealed' | 'opened',
-  capsule: TCapsule,
-) => {
+const filterCapsuleResponse = (capsule: TCapsule) => {
+  // these need to be destructured for some reason, thanks mongoose
   const {
     _id,
+    state,
+    visibility,
+    senders,
+    receivers,
+    showCountdown,
     title,
     content,
-    showCountdown,
+    images,
     openDate,
     sealedAt,
-    visibility,
-    state,
-    senders,
-    receivers,
   } = capsule
 
-  const images = capsule.images.map((image) => ({
-    name: image.name,
-    type: image.type,
-  }))
-
-  const commonFields = {
+  const { error, data } = capsuleResponseSchema.safeParse({
     id: _id,
-    visibility,
     state,
+    visibility,
     senders,
     receivers,
+    showCountdown,
+    title,
+    content,
+    images: images.map((image) => ({
+      name: image.name,
+      type: image.type,
+    })),
+    openDate,
+    sealedAt,
+  })
+
+  if (error) {
+    throw new ValidationError(error)
   }
 
-  switch (filter) {
-    case 'unsealed':
-      return {
-        ...commonFields,
-        showCountdown,
-        title,
-        content,
-        images,
-      }
-    case 'sealed':
-      return {
-        ...commonFields,
-        openDate,
-      }
-    case 'opened':
-      return {
-        ...commonFields,
-        title,
-        content,
-        images,
-        openDate,
-        sealedAt,
-      }
-  }
+  return data
 }
 
 const getCapsules = async ({
@@ -248,7 +238,7 @@ export const capsuleController = {
             )
           }
 
-          res.status(200).json(filterCapsuleResponse('unsealed', capsule))
+          res.status(200).json(filterCapsuleResponse(capsule))
           return
         case 'sealed':
           if (
@@ -272,7 +262,7 @@ export const capsuleController = {
             )
           }
 
-          res.status(200).json(filterCapsuleResponse('sealed', capsule))
+          res.status(200).json(filterCapsuleResponse(capsule))
           return
         case 'opened':
           if (
@@ -286,7 +276,7 @@ export const capsuleController = {
             )
           }
 
-          res.status(200).json(filterCapsuleResponse('opened', capsule))
+          res.status(200).json(filterCapsuleResponse(capsule))
           return
       }
     },
@@ -324,11 +314,7 @@ export const capsuleController = {
 
       res
         .status(200)
-        .json(
-          capsules.map((capsule) =>
-            filterCapsuleResponse(capsule.state, capsule),
-          ),
-        )
+        .json(capsules.map((capsule) => filterCapsuleResponse(capsule)))
     },
     {
       authentication: 'required',
@@ -368,11 +354,7 @@ export const capsuleController = {
 
       res
         .status(200)
-        .json(
-          capsules.map((capsule) =>
-            filterCapsuleResponse(capsule.state, capsule),
-          ),
-        )
+        .json(capsules.map((capsule) => filterCapsuleResponse(capsule)))
     },
     {
       schemas: {
