@@ -33,7 +33,7 @@ const filterCapsuleResponse = (
     type: image.type,
   }))
 
-  const commonFileds = {
+  const commonFields = {
     id: _id,
     visibility,
     state,
@@ -44,7 +44,7 @@ const filterCapsuleResponse = (
   switch (filter) {
     case 'unsealed':
       return {
-        ...commonFileds,
+        ...commonFields,
         showCountdown,
         title,
         content,
@@ -52,12 +52,12 @@ const filterCapsuleResponse = (
       }
     case 'sealed':
       return {
-        ...commonFileds,
+        ...commonFields,
         openDate,
       }
     case 'opened':
       return {
-        ...commonFileds,
+        ...commonFields,
         title,
         content,
         images,
