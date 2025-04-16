@@ -466,14 +466,14 @@ _register a new account_
 
 #### request body
 
-| key       | type            |
-| --------- | --------------- |
-| username  | `string`        |
-| firstName | `string`        |
-| lastName  | `string`        |
-| email     | `string`        |
-| password  | `string`        |
-| image     | optional `File` |
+| key       | type              |
+| --------- | ----------------- |
+| username  | `string`          |
+| firstName | optional `string` |
+| lastName  | optional `string` |
+| email     | `string`          |
+| password  | `string`          |
+| image     | optional `File`   |
 
 #### request example
 
@@ -493,6 +493,14 @@ curl --request POST \
 
 _201: Created_
 
+a refresh token is set as an http only cookie
+
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2U2NmQ3MWQ2OTQ0ZWU3MmYyMGNlYWIiLCJpYXQiOjE3NDMxNTQ1NDksImV4cCI6MTc0MzE1NTQ0OX0.t-jLWhzISmHsb9ErNOkSEK-njFj5bEXnrz1PzdbjbjA"
+}
+```
+
 #### possible errors
 
 | status code | message                          |
@@ -511,10 +519,11 @@ _authenticate a user_
 
 #### request body
 
-| key      | type     |
-| -------- | -------- |
-| username | `string` |
-| password | `string` |
+| key      | type              |
+| -------- | ----------------- |
+| username | optional `string` |
+| email    | optional `string` |
+| password | `string`          |
 
 #### request example
 

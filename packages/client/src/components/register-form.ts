@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
 import { registerActionSchema } from '@repo/validation/actions'
+import { router } from '../main'
+import { auth } from '../lib/auth'
 import { ComponentWithMutation } from '../core/component'
 import { element } from '../utils/element'
-import { client } from '../lib/client'
-import { router } from '../main'
 import { Button } from '../components/button'
 import { Input } from '../components/input'
 import { Toaster } from '../components/toaster'
@@ -26,7 +26,7 @@ export class RegisterForm extends ComponentWithMutation<RegisterValues> {
   protected schema = () => schema
 
   protected async mutation(values: RegisterValues) {
-    await client.post('/auth/register', values)
+    auth.register(values)
     router.navigate('/')
   }
 
