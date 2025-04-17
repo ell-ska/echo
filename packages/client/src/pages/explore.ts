@@ -8,6 +8,8 @@ import { Capsule } from '../components/capsule'
 import { getImageUrl } from '../utils/get-image-url'
 import { Countdown } from '../components/countdown'
 import { Tabs } from '../components/tabs'
+import { Skeleton } from '../components/skeleton'
+import { cn } from '../utils/classnames'
 
 const schema = z.array(capsuleResponseSchema)
 
@@ -29,7 +31,10 @@ export class ExplorePage extends ComponentWithData<CapsuleData[]> {
 
   render() {
     const main = element('main', {
-      className: 'main-unauthenticated max-w-md gap-6',
+      className: cn(
+        'main-unauthenticated max-w-md gap-6',
+        this.isLoading && 'h-[80vh] overflow-hidden mb-0'
+      ),
       children: [
         new Tabs({
           tabs: [
@@ -48,7 +53,11 @@ export class ExplorePage extends ComponentWithData<CapsuleData[]> {
       ],
     })
 
-    // TODO: display loader
+    if (this.isLoading) {
+      new Skeleton({ className: 'h-96' }).mount(main)
+      new Skeleton({ className: 'h-96' }).mount(main)
+      return main
+    }
 
     if (!this.data || this.data.length === 0) {
       const error = element('div', {

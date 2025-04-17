@@ -20,7 +20,7 @@ export class Tabs extends Component<Props> {
 
     const div = element('div', {
       className:
-        'fixed bottom-8 flex gap-2 p-1 bg-white rounded-full shadow-float',
+        'fixed z-40 bottom-8 flex gap-2 p-1 bg-white rounded-full shadow-float',
     })
 
     tabs.forEach(({ label, href, isActive }) => {
