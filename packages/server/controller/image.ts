@@ -4,7 +4,7 @@ import type { Response } from 'express'
 import { User } from '../models/user'
 import { handle } from '../lib/handler'
 import { getBucketConnection, getFileId } from '../lib/file'
-import { HandlerError, NotFoundError, UnexpectedError } from '../lib/errors'
+import { HandlerError, NotFoundError } from '../lib/errors'
 import { objectIdSchema } from '../lib/validation'
 import { Capsule } from '../models/capsule'
 
@@ -21,19 +21,15 @@ const imageResponse = async ({
   const id = getFileId(name)
   const downloadStream = bucket.openDownloadStream(id)
 
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
   res.set('Content-Type', type)
 
   downloadStream.on('data', (chunk) => {
     res.write(chunk)
   })
 
-  downloadStream.on('error', (error) => {
-    throw new UnexpectedError(
-      error.message,
-      'something went wrong when downloading the image',
-      500,
-      'database_download_image',
-    )
+  downloadStream.on('error', () => {
+    res.status(404).end()
   })
 
   downloadStream.on('end', () => {

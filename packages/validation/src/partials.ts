@@ -14,10 +14,4 @@ export const username = z
   .min(3, 'username must be at least 3 characters')
   .max(30, 'username cannot be longer than 30 characters')
 
-export const image = z.object({
-  name: z.string(),
-  type: z.string(),
-  size: z.number(),
-})
-
 export const id = z.coerce.string()

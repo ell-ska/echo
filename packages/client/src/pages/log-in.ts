@@ -27,8 +27,7 @@ export class LogInPage extends Component {
     })
 
     return element('main', {
-      className:
-        'grow w-full max-w-xl flex flex-col items-center gap-6 md:gap-2 px-4 pt-header-sm mb-6 mt-4 md:pt-header-md md:mb-8',
+      className: 'main-unauthenticated max-w-xl gap-6 md:gap-2',
       children: [
         element('div', {
           className: 'grow w-full flex flex-col items-center mt-[10vh] gap-8',
