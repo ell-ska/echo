@@ -74,6 +74,25 @@ const getCapsules = async ({
   const limit = queryParams?.take || 10
   const skip = queryParams?.skip || 0
 
+  const lookupUsers = (field: string) => {
+    return {
+      from: 'users',
+      localField: field,
+      foreignField: '_id',
+      pipeline: [
+        {
+          $project: {
+            image: 1,
+            username: 1,
+            firstName: 1,
+            lastName: 1,
+          },
+        },
+      ],
+      as: field,
+    }
+  }
+
   return await Capsule.aggregate([
     {
       $addFields: {
@@ -120,6 +139,12 @@ const getCapsules = async ({
     },
     {
       $limit: limit,
+    },
+    {
+      $lookup: lookupUsers('senders'),
+    },
+    {
+      $lookup: lookupUsers('receivers'),
     },
   ])
 }
@@ -221,7 +246,10 @@ export const capsuleController = {
   ),
   getCapsuleById: handle(
     async ({ res, params: { id }, userId }) => {
-      const capsule = await Capsule.findById(id)
+      const capsule = await Capsule.findById(id).populate(
+        'senders',
+        'image username firstName lastName',
+      )
 
       if (!capsule) {
         throw new NotFoundError('capsule not found')
