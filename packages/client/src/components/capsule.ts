@@ -1,13 +1,10 @@
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
+import { formatDistanceToNow } from 'date-fns'
 
 import type { UserData } from '@repo/validation/data'
 import { Component } from '../core/component'
 import { Profile } from './profile'
 import { element } from '../utils/element'
 import { getImageUrl } from '../utils/get-image-url'
-
-dayjs.extend(relativeTime)
 
 type Props = {
   id: string
@@ -47,7 +44,7 @@ export class Capsule extends Component<Props> {
 
     const dateFromNow = element('time', {
       className: 'text-sm text-zinc-600',
-      innerText: dayjs(openDate).fromNow(),
+      innerText: `${formatDistanceToNow(openDate)} ago`,
     })
 
     const info = element('div', {
