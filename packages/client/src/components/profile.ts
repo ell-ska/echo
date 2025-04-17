@@ -18,26 +18,31 @@ export class Profile extends Component<Props> {
       size === 'lg' && 'size-20 text-2xl font-black'
     )
 
-    if (src) {
-      return element('img', {
-        src: this.props.src,
-        className: cn(commonClasses, sizeClasses),
-      })
-    }
+    const image = element('img', {
+      src: src,
+      onerror: () => {
+        image.classList.add('hidden')
+        fallback.classList.remove('hidden')
+        fallback.classList.add('flex')
+      },
+      onload: () => {
+        image.classList.add('block')
+        fallback.classList.add('hidden')
+      },
+      className: cn(commonClasses, sizeClasses),
+    })
 
-    if (initials) {
-      return element('div', {
-        innerText: this.props.initials,
-        className: cn(
-          commonClasses,
-          sizeClasses,
-          'bg-primary-subtle flex items-center justify-center text-primary-bright uppercase'
-        ),
-      })
-    }
+    const fallback = element('div', {
+      innerText: initials || '',
+      className: cn(
+        commonClasses,
+        sizeClasses,
+        'hidden bg-primary-subtle items-center justify-center text-primary-bright uppercase'
+      ),
+    })
 
     return element('div', {
-      className: cn(commonClasses, sizeClasses, 'bg-primary-subtle'),
+      children: [image, fallback],
     })
   }
 }
