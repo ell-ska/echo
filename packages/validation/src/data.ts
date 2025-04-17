@@ -6,11 +6,23 @@ export const tokenResponseSchema = z.object({
   accessToken: z.string(),
 })
 
+const image = z.object({
+  name: z.string(),
+  type: z.string(),
+})
+
+const user = z.object({
+  username: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  image,
+})
+
 const capsule = z.object({
   id,
   visibility: z.enum(['public', 'private']),
-  senders: z.array(id),
-  receivers: z.array(id),
+  senders: z.array(user).nonempty(),
+  receivers: z.array(user),
 })
 
 const unsealedCapsule = capsule.merge(
@@ -19,17 +31,12 @@ const unsealedCapsule = capsule.merge(
     showCountdown: z.boolean(),
     title: z.string(),
     content: z.string().optional(),
-    images: z.array(
-      z.object({
-        name: z.string(),
-        type: z.string(),
-      })
-    ),
+    images: z.array(image),
   })
 )
 
 const sealedCapsule = capsule.merge(
-  z.object({ state: z.literal('sealed'), openDate: z.date() })
+  z.object({ state: z.literal('sealed'), openDate: z.coerce.date() })
 )
 
 const openedCapsule = capsule.merge(
@@ -43,8 +50,8 @@ const openedCapsule = capsule.merge(
         type: z.string(),
       })
     ),
-    openDate: z.date(),
-    sealedAt: z.date(),
+    openDate: z.coerce.date(),
+    sealedAt: z.coerce.date(),
   })
 )
 

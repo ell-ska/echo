@@ -1,26 +1,6 @@
 import { Document, InferSchemaType, model, Schema, Types } from 'mongoose'
 
 import { imageSchema } from '../schemas/image'
-import { z } from 'zod'
-
-const sealValidation = {
-  validator: () => {
-    const schema = z
-      .object({
-        sealedAt: z.date().optional(),
-        openDate: z.date().optional(),
-      })
-      .refine((data) => {
-        return (
-          (data.sealedAt && data.openDate) || (!data.sealedAt && !data.openDate)
-        )
-      })
-
-    const { success } = schema.safeParse(this)
-    return success
-  },
-  message: 'document must have either both sealedAt and openDate, or neither',
-}
 
 const schema = new Schema(
   {
@@ -31,11 +11,9 @@ const schema = new Schema(
     },
     sealedAt: {
       type: Date,
-      validate: sealValidation,
     },
     openDate: {
       type: Date,
-      validate: sealValidation,
     },
     showCountdown: {
       type: Boolean,
