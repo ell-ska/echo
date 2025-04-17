@@ -50,9 +50,15 @@ export class ExplorePage extends ComponentWithData<CapsuleData[]> {
 
     // TODO: display loader
 
-    if (!this.data) {
-      // TODO: display error
-      return element('main', { innerText: 'error' })
+    if (!this.data || this.data.length === 0) {
+      const error = element('div', {
+        className: 'mt-[20vh] text-center text-xl font-bold',
+        innerText:
+          'Oops! The capsule vault is empty. The time travelers must be running late!',
+      })
+      main.appendChild(error)
+
+      return main
     }
 
     this.data.forEach((capsule) => {
