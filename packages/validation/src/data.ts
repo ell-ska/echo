@@ -2,27 +2,32 @@ import { z } from 'zod'
 
 import { id } from './partials'
 
-export const tokenResponseSchema = z.object({
-  accessToken: z.string(),
-})
-
 const image = z.object({
   name: z.string(),
   type: z.string(),
 })
 
-const user = z.object({
+export type ImageData = z.infer<typeof image>
+
+export const tokenResponseSchema = z.object({
+  accessToken: z.string(),
+})
+
+export const userResponseSchema = z.object({
+  _id: id,
   username: z.string(),
   firstName: z.string(),
   lastName: z.string(),
   image,
 })
 
+export type UserData = z.infer<typeof userResponseSchema>
+
 const capsule = z.object({
   id,
   visibility: z.enum(['public', 'private']),
-  senders: z.array(user).nonempty(),
-  receivers: z.array(user),
+  senders: z.array(userResponseSchema).nonempty(),
+  receivers: z.array(userResponseSchema),
 })
 
 const unsealedCapsule = capsule.merge(
