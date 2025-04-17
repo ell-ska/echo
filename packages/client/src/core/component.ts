@@ -50,7 +50,7 @@ export abstract class ComponentWithData<
   Data,
   Props extends {} = {},
   State extends {} = {},
-> extends Component<Props, State> {
+> extends Base<Props, State> {
   protected data: Data | null = null
   protected isLoading = true
   protected error: string | null = null

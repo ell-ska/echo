@@ -1,6 +1,12 @@
 import { z } from 'zod'
 
-import { image, password, username } from './partials'
+import { password, username } from './partials'
+
+const image = z.object({
+  name: z.string(),
+  type: z.string(),
+  size: z.number(),
+})
 
 export const registerActionSchema = z.object({
   username: username,
@@ -8,6 +14,7 @@ export const registerActionSchema = z.object({
   lastName: z.string().min(1).optional(),
   email: z.string().email(),
   password: password,
+  // TODO: the image will need to be updated because when sending the image from the client it will be a file
   image: image.optional(),
 })
 
