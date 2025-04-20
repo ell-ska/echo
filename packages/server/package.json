@@ -1,5 +1,6 @@
 {
   "name": "@repo/server",
+  "type": "module",
   "scripts": {
     "dev": "bun --hot run api/index.ts"
   },
