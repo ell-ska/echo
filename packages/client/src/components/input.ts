@@ -6,6 +6,7 @@ type Props = {
   label: string
   name: string
   error?: string
+  textarea?: boolean
 } & Partial<
   Omit<
     HTMLElementTagNameMap['input'],
@@ -19,9 +20,9 @@ export class Input extends Component<Props> {
   }
 
   render() {
-    const { label, error, name, ...attributes } = this.props
+    const { label, error, name, textarea = false, ...attributes } = this.props
 
-    const input = element('input', {
+    const input = element(textarea ? 'textarea' : 'input', {
       ...attributes,
       name,
       id: name,
@@ -29,6 +30,7 @@ export class Input extends Component<Props> {
       className: cn(
         'peer w-full px-4 py-2 bg-zinc-100 text-base text-zinc-800 outline-none rounded-lg border border-transparent placeholder:text-transparent',
         'focus-visible:border-primary-bright',
+        textarea && 'min-h-56 resize-none',
         error && 'border-warning-bright'
       ),
     })
