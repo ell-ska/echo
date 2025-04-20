@@ -54,11 +54,17 @@ schema.virtual('state').get(function () {
 })
 
 schema.method('isSentBy', function (userId: Types.ObjectId) {
-  return this.senders.includes(userId)
+  if (!userId) return false
+  return this.senders.some(
+    (sender) => sender._id.toString() === userId.toString(),
+  )
 })
 
 schema.method('isReceivedBy', function (userId: Types.ObjectId) {
-  return this.receivers.includes(userId)
+  if (!userId) return false
+  return this.receivers.some(
+    (receiver) => receiver._id.toString() === userId.toString(),
+  )
 })
 
 schema.pre('save', function (next) {
