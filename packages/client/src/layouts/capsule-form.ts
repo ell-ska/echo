@@ -41,7 +41,7 @@ export class CapsuleFormLayout extends Component<Props> {
 
     const buttonContainer = element('div', {
       className:
-        'fixed left-4 right-4 mx-auto bottom-8 flex flex-col items-center gap-2 max-w-5xl *:w-full md:flex-row md:justify-end md:*:w-auto',
+        'fixed left-4 right-4 mx-auto bottom-8 flex flex-col items-center gap-2 max-w-sm *:w-full md:flex-row md:justify-end md:max-w-5xl md:*:w-auto',
       children: buttons,
     })
 
