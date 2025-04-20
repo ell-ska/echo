@@ -17,6 +17,7 @@ import { Countdown } from '../components/countdown'
 import { Button } from '../components/button'
 import { Image } from '../components/image'
 import { Skeleton } from '../components/skeleton'
+import { router } from '../main'
 
 type Props = { params: Params }
 
@@ -62,9 +63,11 @@ export class CapsulePage extends ComponentWithData<CapsuleData, Props> {
       return main
     }
 
-    // TODO: error handling
     if (!this.data) {
-      return element('div', { innerText: 'error' })
+      router.notFound()
+      // TODO: this will never be rendered and should not be here
+      // it's just here to satisfy the restraints of render
+      return element('div')
     }
 
     const options =

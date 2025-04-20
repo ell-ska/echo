@@ -43,6 +43,10 @@ export class Router {
     this.handleRoute()
   }
 
+  notFound() {
+    this.render(this.notFoundHandler())
+  }
+
   private createRoute({
     path,
     handler,
