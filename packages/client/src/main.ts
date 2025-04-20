@@ -1,8 +1,9 @@
 import { Toaster } from './components/toaster'
-import { Params, Router } from './core/router'
+import { Router } from './core/router'
 import { UnauthenticatedLayout } from './layouts/unauthenticated'
 import { CapsulePage } from './pages/capsule'
 import { CreateCapsulePage } from './pages/create-capsule'
+import { EditCapsulePage } from './pages/edit-capsule'
 import { ExplorePage } from './pages/explore'
 import { LogInPage } from './pages/log-in'
 import { RegisterPage } from './pages/register'
@@ -18,9 +19,9 @@ export const router = new Router({
     '/capsule/create': () => new CreateCapsulePage(),
     '/capsule/:id': (params) =>
       new UnauthenticatedLayout({
-        children: [new CapsulePage({ params: params as Params }).element],
+        children: [new CapsulePage({ params: params! }).element],
       }),
-    '/capsule/:id/edit': () => new TemporaryPage(),
+    '/capsule/:id/edit': (params) => new EditCapsulePage({ params: params! }),
     '/profile': () => new TemporaryPage(),
     '/profile/edit': () => new TemporaryPage(),
     '/auth/register': () =>

@@ -14,7 +14,7 @@ export class CreateCapsulePage extends Component {
       children: [
         element('main', {
           className: 'main-with-header max-w-sm *:w-full',
-          children: [new CapsuleFormContent().element],
+          children: [new CapsuleFormContent({ type: 'create' }).element],
         }),
       ],
       buttons: [
