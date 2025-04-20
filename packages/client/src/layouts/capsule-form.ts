@@ -3,6 +3,7 @@ import { Component } from '../core/component'
 import { type Child, element } from '../utils/element'
 import { Button } from '../components/button'
 import { Header } from '../components/header'
+import { router } from '../main'
 
 type Props = {
   children: Child[]
@@ -24,6 +25,7 @@ export class CapsuleFormLayout extends Component<Props> {
         new Button({
           variant: 'tertiary',
           icon: X,
+          onClick: () => router.back(),
         }).element,
       ],
     })
