@@ -17,7 +17,7 @@ export const userController = {
       }
 
       res.status(200).json({
-        id: user._id,
+        _id: user._id,
         username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -36,7 +36,7 @@ export const userController = {
       const user = (await User.findById(userId))!
 
       res.status(200).json({
-        id: user._id,
+        _id: user._id,
         username: user.username,
         firstName: user.firstName,
         lastName: user.lastName,

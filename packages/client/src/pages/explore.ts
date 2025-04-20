@@ -73,11 +73,11 @@ export class ExplorePage extends ComponentWithData<CapsuleData[]> {
     this.data.forEach((capsule) => {
       if (capsule.state === 'opened') {
         const c = new Capsule({
-          id: capsule.id,
+          id: capsule._id,
           title: capsule.title,
           image: getImageUrl({
             type: 'capsule',
-            capsuleId: capsule.id,
+            capsuleId: capsule._id,
             imageName: capsule.images[0]?.name,
           }),
           openDate: capsule.openDate,
@@ -85,7 +85,7 @@ export class ExplorePage extends ComponentWithData<CapsuleData[]> {
         })
         c.mount(main)
       } else if (capsule.state === 'sealed') {
-        const c = new Countdown({ id: capsule.id, openDate: capsule.openDate })
+        const c = new Countdown({ id: capsule._id, openDate: capsule.openDate })
         c.mount(main)
       }
     })

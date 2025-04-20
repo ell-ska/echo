@@ -34,7 +34,7 @@ const filterCapsuleResponse = (capsule: TCapsule) => {
   } = capsule
 
   const { error, data } = capsuleResponseSchema.safeParse({
-    id: _id,
+    _id,
     state,
     visibility,
     senders,

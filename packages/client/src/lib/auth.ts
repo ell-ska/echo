@@ -1,5 +1,5 @@
 import type { RegisterValues, LoginValues } from '@repo/validation/actions'
-import { tokenResponseSchema } from '@repo/validation/data'
+import { tokenResponseSchema, userResponseSchema } from '@repo/validation/data'
 import { client } from './client'
 
 class Auth {
@@ -14,7 +14,7 @@ class Auth {
     return this.accessToken
   }
 
-  private async fetch(
+  private async fetchTokens(
     path: '/log-in' | '/register',
     values: LoginValues | RegisterValues
   ) {
@@ -25,11 +25,11 @@ class Auth {
   }
 
   async register(values: RegisterValues) {
-    await this.fetch('/register', values)
+    await this.fetchTokens('/register', values)
   }
 
   async logIn(values: LoginValues) {
-    await this.fetch('/log-in', values)
+    await this.fetchTokens('/log-in', values)
   }
 
   async logOut() {
@@ -50,6 +50,22 @@ class Auth {
       this.accessToken = null
     } finally {
       this.isRefetching = false
+    }
+  }
+
+  async getCurrentUser() {
+    try {
+      const response = await client.get('/users/me')
+
+      const { data, error } = userResponseSchema.safeParse(response.data)
+
+      if (error) {
+        return null
+      }
+
+      return data
+    } catch {
+      return null
     }
   }
 }

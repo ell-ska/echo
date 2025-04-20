@@ -19,7 +19,7 @@ export const router = new Router({
         children: [new CapsulePage({ params: params as Params }).element],
       }),
     '/capsule/create': () => new TemporaryPage(),
-    '/capsule/edit': () => new TemporaryPage(),
+    '/capsule/:id/edit': () => new TemporaryPage(),
     '/profile': () => new TemporaryPage(),
     '/profile/edit': () => new TemporaryPage(),
     '/auth/register': () =>
