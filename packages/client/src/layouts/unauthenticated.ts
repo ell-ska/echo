@@ -1,3 +1,4 @@
+import { Button } from '../components/button'
 import { Header } from '../components/header'
 import { Component } from '../core/component'
 import { Child, element } from '../utils/element'
@@ -13,7 +14,20 @@ export class UnauthenticatedLayout extends Component<Props> {
 
   render() {
     const { children } = this.props
-    const header = new Header()
+
+    const logo = element('a', {
+      innerText: 'echo',
+      href: '/',
+      className: 'text-lg font-black',
+    })
+
+    const button = new Button({
+      label: 'Log in',
+      size: 'sm',
+      href: '/auth/log-in',
+    })
+
+    const header = new Header({ children: [logo, button.element] })
 
     const div = element('div', {
       children: [header.element, ...children],
