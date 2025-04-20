@@ -16,6 +16,7 @@ import { DeleteCapsuleButton } from '../components/delete-capsule-button'
 import { Countdown } from '../components/countdown'
 import { Button } from '../components/button'
 import { Image } from '../components/image'
+import { Skeleton } from '../components/skeleton'
 
 type Props = { params: Params }
 
@@ -31,20 +32,41 @@ export class CapsulePage extends ComponentWithData<CapsuleData, Props> {
   }
 
   render() {
-    // TODO: loading state
-
-    // TODO: error handling
-    if (!this.data) {
-      return element('div', { innerText: 'error' })
-    }
-
     const main = element('main', {
       className: cn(
         'main-unauthenticated max-w-5xl gap-8 md:flex-row md:items-start md:justify-between'
       ),
     })
 
-    // TODO: edit button
+    if (this.isLoading) {
+      const images = element('div', {
+        className: 'flex flex-wrap gap-1 mt-4',
+        children: [
+          new Skeleton({ className: 'h-36 w-36' }).element,
+          new Skeleton({ className: 'h-36 w-30' }).element,
+          new Skeleton({ className: 'h-36 w-40' }).element,
+        ],
+      })
+
+      main.appendChild(
+        element('div', {
+          className: 'flex flex-col gap-4',
+          children: [
+            new Skeleton({ className: 'h-10' }).element,
+            new Skeleton({ className: 'h-20' }).element,
+            images,
+          ],
+        })
+      )
+
+      return main
+    }
+
+    // TODO: error handling
+    if (!this.data) {
+      return element('div', { innerText: 'error' })
+    }
+
     const options =
       this.user && isSender(this.user._id, this.data.senders)
         ? element('div', {
