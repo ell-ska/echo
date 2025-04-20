@@ -27,7 +27,7 @@ export class RegisterPage extends Component {
     })
 
     return element('main', {
-      className: 'main-unauthenticated max-w-xl gap-6 md:gap-2',
+      className: 'main-with-header max-w-xl gap-6 md:gap-2',
       children: [
         element('div', {
           className: 'grow w-full flex flex-col items-center mt-[10vh] gap-8',

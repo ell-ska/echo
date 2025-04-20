@@ -25,7 +25,7 @@
     @apply outline-1;
   }
 
-  .main-unauthenticated {
+  .main-with-header {
     @apply grow w-full flex flex-col items-center px-4 pt-header-sm mb-6 mt-4 md:pt-header-md md:mb-8;
   }
 }
