@@ -35,7 +35,7 @@ export class CapsulePage extends ComponentWithData<CapsuleData, Props> {
   render() {
     const main = element('main', {
       className: cn(
-        'main-unauthenticated max-w-5xl gap-8 md:flex-row md:items-start md:justify-between'
+        'main-with-header max-w-5xl gap-8 md:flex-row md:items-start md:justify-between'
       ),
     })
 

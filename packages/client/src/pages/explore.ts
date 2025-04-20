@@ -32,7 +32,7 @@ export class ExplorePage extends ComponentWithData<CapsuleData[]> {
   render() {
     const main = element('main', {
       className: cn(
-        'main-unauthenticated max-w-md gap-6',
+        'main-with-header max-w-md gap-6',
         this.isLoading && 'h-[80vh] overflow-hidden mb-0'
       ),
       children: [
