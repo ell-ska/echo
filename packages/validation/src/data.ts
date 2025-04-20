@@ -16,8 +16,8 @@ export const tokenResponseSchema = z.object({
 export const userResponseSchema = z.object({
   _id,
   username: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
   image: image.optional(),
 })
 
