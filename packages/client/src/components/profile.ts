@@ -18,6 +18,7 @@ export class Profile extends Component<Props> {
       size === 'lg' && 'size-20 text-2xl font-black'
     )
 
+    // TODO: change to use Image component
     const image = element('img', {
       src: src,
       onerror: () => {

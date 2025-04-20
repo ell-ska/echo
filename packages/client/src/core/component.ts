@@ -1,5 +1,8 @@
-import { type AxiosResponse, isAxiosError } from 'axios'
 import { z, ZodFormattedError } from 'zod'
+import { type AxiosResponse, isAxiosError } from 'axios'
+
+import type { UserData } from '@repo/validation/data'
+import { auth } from '../lib/auth'
 
 type Constructor<Props, State> = { props?: Props; state?: State }
 
@@ -55,10 +58,18 @@ export abstract class ComponentWithData<
   protected isLoading = true
   protected error: string | null = null
 
-  constructor({ props, state }: Constructor<Props, State>) {
+  private authenticate: boolean
+  protected user: UserData | null = null
+
+  constructor({
+    props,
+    state,
+    authenticate = false,
+  }: Constructor<Props, State> & { authenticate?: boolean }) {
     super({ props, state })
     // this cannot be called in Base because the initialization order will make scoped variables be undefined in the first render
     this.element = this.render()
+    this.authenticate = authenticate
     this.get()
   }
 
@@ -73,6 +84,10 @@ export abstract class ComponentWithData<
       }
 
       this.data = data
+
+      if (this.authenticate) {
+        this.user = await auth.getCurrentUser()
+      }
     } catch (error) {
       if (isAxiosError(error) && error.response?.data.error) {
         this.error = error.response?.data.error

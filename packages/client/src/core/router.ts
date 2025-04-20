@@ -1,6 +1,6 @@
 import { Component } from './component'
 
-type Params = Record<string, string>
+export type Params = Record<string, string>
 type Page = Component
 type RouteHandler = (params?: Params) => Page
 type Route = {
@@ -41,6 +41,10 @@ export class Router {
   navigate(path: string) {
     history.pushState({}, '', path)
     this.handleRoute()
+  }
+
+  notFound() {
+    this.render(this.notFoundHandler())
   }
 
   private createRoute({

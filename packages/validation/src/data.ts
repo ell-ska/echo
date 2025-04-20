@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { id } from './partials'
+import { _id } from './partials'
 
 const image = z.object({
   name: z.string(),
@@ -14,17 +14,17 @@ export const tokenResponseSchema = z.object({
 })
 
 export const userResponseSchema = z.object({
-  _id: id,
+  _id,
   username: z.string(),
   firstName: z.string(),
   lastName: z.string(),
-  image,
+  image: image.optional(),
 })
 
 export type UserData = z.infer<typeof userResponseSchema>
 
 const capsule = z.object({
-  id,
+  _id,
   visibility: z.enum(['public', 'private']),
   senders: z.array(userResponseSchema).nonempty(),
   receivers: z.array(userResponseSchema),

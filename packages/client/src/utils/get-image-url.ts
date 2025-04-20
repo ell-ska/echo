@@ -2,7 +2,7 @@ type Data =
   | {
       type: 'capsule'
       capsuleId: string
-      imageName: string | undefined
+      imageName: string
     }
   | { type: 'user'; id: string }
   | { type: 'me' }
@@ -12,10 +12,7 @@ export const getImageUrl = (data: Data) => {
 
   switch (data.type) {
     case 'capsule':
-      return (
-        data.imageName &&
-        `${base}/capsules/${data.capsuleId}/images/${data.imageName}`
-      )
+      return `${base}/capsules/${data.capsuleId}/images/${data.imageName}`
     case 'user':
       return `${base}/users/${data.id}/image`
     case 'me':

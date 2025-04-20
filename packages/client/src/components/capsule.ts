@@ -5,6 +5,7 @@ import { Component } from '../core/component'
 import { Profile } from './profile'
 import { element } from '../utils/element'
 import { getImageUrl } from '../utils/get-image-url'
+import { Image } from './image'
 
 type Props = {
   id: string
@@ -59,19 +60,18 @@ export class Capsule extends Component<Props> {
       ],
     })
 
-    const image = element('img', {
-      className: 'max-h-[60vh] object-cover w-full',
-      src: imageUrl,
-      onerror: () => {
-        image.classList.add('hidden')
-      },
-    })
+    const image = imageUrl
+      ? new Image({
+          url: imageUrl,
+          className: 'max-h-[60vh] object-cover w-full',
+        })
+      : null
 
     return element('a', {
       href: `/capsule/${id}`,
       className:
         'group w-full border border-zinc-100 rounded-3xl overflow-hidden',
-      children: [image, info],
+      children: [image?.element, info],
     })
   }
 }
