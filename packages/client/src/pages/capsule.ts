@@ -13,6 +13,7 @@ import { getImageUrl } from '../utils/get-image-url'
 import { Profile } from '../components/profile'
 import { isSender } from '../utils/is-sender'
 import { DeleteCapsuleButton } from '../components/delete-capsule-button'
+import { Countdown } from '../components/countdown'
 
 type Props = { params: Params }
 
@@ -28,12 +29,6 @@ export class CapsulePage extends ComponentWithData<CapsuleData, Props> {
   }
 
   render() {
-    const main = element('main', {
-      className: cn(
-        'main-unauthenticated max-w-5xl gap-8 md:flex-row md:items-start md:justify-between'
-      ),
-    })
-
     // TODO: loading state
 
     // TODO: error handling
@@ -41,7 +36,41 @@ export class CapsulePage extends ComponentWithData<CapsuleData, Props> {
       return element('div', { innerText: 'error' })
     }
 
-    // TODO: sealed state
+    const main = element('main', {
+      className: cn(
+        'main-unauthenticated max-w-5xl gap-8 md:flex-row md:items-start md:justify-between'
+      ),
+    })
+
+    // TODO: edit button
+    const options =
+      this.user && isSender(this.user._id, this.data.senders)
+        ? element('div', {
+            className: 'self-end md:order-1',
+            children: [new DeleteCapsuleButton({ id: this.data._id }).element],
+          })
+        : null
+
+    if (this.data.state === 'sealed') {
+      const countdown = new Countdown({
+        openDate: this.data.openDate,
+        openAction: 'reload',
+      })
+
+      main.append(
+        element('div', {
+          className: 'w-full md:flex-1',
+          children: [countdown.element],
+        })
+      )
+      main.append(
+        element('div', {
+          className: 'flex flex-col w-full md:flex-1',
+          children: [options],
+        })
+      )
+    }
+
     // TODO: unsealed state
     if (this.data.state === 'opened') {
       const title = element('h1', {
@@ -118,17 +147,6 @@ export class CapsulePage extends ComponentWithData<CapsuleData, Props> {
         const div = getUserElement(receiver)
         from.appendChild(div)
       })
-
-      // TODO: edit button
-      const options =
-        this.user && isSender(this.user._id, this.data.senders)
-          ? element('div', {
-              className: 'self-end md:order-1',
-              children: [
-                new DeleteCapsuleButton({ id: this.data._id }).element,
-              ],
-            })
-          : null
 
       const users = element('div', {
         className: 'flex gap-8 md:order-2',

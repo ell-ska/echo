@@ -85,7 +85,11 @@ export class ExplorePage extends ComponentWithData<CapsuleData[]> {
         })
         c.mount(main)
       } else if (capsule.state === 'sealed') {
-        const c = new Countdown({ id: capsule._id, openDate: capsule.openDate })
+        const c = new Countdown({
+          id: capsule._id,
+          openDate: capsule.openDate,
+          openAction: 'link',
+        })
         c.mount(main)
       }
     })

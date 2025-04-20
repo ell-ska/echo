@@ -5,10 +5,13 @@ import { element } from '../utils/element'
 import { Button } from './button'
 import { cn } from '../utils/classnames'
 
-type Props = {
-  id: string
-  openDate: Date
-}
+type Props = { openDate: Date } & (
+  | {
+      id: string
+      openAction: 'link'
+    }
+  | { openAction: 'reload' }
+)
 
 type State = {
   hasOpened: boolean
@@ -22,7 +25,7 @@ export class Countdown extends Component<Props, State> {
   }
 
   render() {
-    const { id, openDate } = this.props
+    const { openDate } = this.props
 
     const years = element('span')
     const days = element('span')
@@ -65,17 +68,21 @@ export class Countdown extends Component<Props, State> {
       'flex justify-between items-center gap-1 w-full border border-zinc-100 rounded-3xl bg-white'
 
     if (this.state.hasOpened) {
-      return element('a', {
-        href: `/capsule/${id}`,
-        className: cn(commonClasses, 'p-2 pl-3 transition hover:bg-zinc-100'),
-        children: [
-          element('p', {
-            innerText: 'The wait is finally over!',
-            className: 'font-bold',
-          }),
-          new Button({ label: 'View capsule', size: 'sm' }).element,
-        ],
-      })
+      if (this.props.openAction === 'link') {
+        return element('a', {
+          href: `/capsule/${this.props.id}`,
+          className: cn(commonClasses, 'p-2 pl-3 transition hover:bg-zinc-100'),
+          children: [
+            element('p', {
+              innerText: 'The wait is finally over!',
+              className: 'font-bold',
+            }),
+            new Button({ label: 'View capsule', size: 'sm' }).element,
+          ],
+        })
+      }
+
+      window.location.reload()
     }
 
     const durationClasses =
