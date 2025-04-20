@@ -49,6 +49,8 @@ type Props = {
   href?: string
   onClick?: (event: MouseEvent) => void
   type?: HTMLButtonElement['type']
+  form?: string
+  classes?: string
 }
 
 export class Button extends Component<Props> {
@@ -65,6 +67,8 @@ export class Button extends Component<Props> {
       href,
       onClick,
       type,
+      form,
+      classes,
     } = this.props
 
     const span = label
@@ -81,7 +85,8 @@ export class Button extends Component<Props> {
 
     const children = [icon, span]
     const className = cn(
-      variants({ variant, shape: icon ? 'round' : 'pill', size })
+      variants({ variant, shape: icon ? 'round' : 'pill', size }),
+      classes
     )
 
     if (href) {
@@ -97,6 +102,10 @@ export class Button extends Component<Props> {
       className,
       type,
     })
+
+    if (form) {
+      button.setAttribute('form', form)
+    }
 
     if (onClick) {
       button.addEventListener('click', (event) => onClick(event))
