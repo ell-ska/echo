@@ -4,7 +4,7 @@ import { capsuleActionSchema } from '@repo/validation/actions'
 import { ComponentWithMutation } from '../../core/component'
 import { element } from '../../utils/element'
 import { Input } from '../input'
-import { Upload } from '../upload'
+// import { Upload } from '../upload'
 import { client } from '../../lib/client'
 import { Toaster } from '../toaster'
 import { router } from '../../main'
@@ -17,6 +17,15 @@ const schema = capsuleActionSchema.pick({
 
 type Values = z.input<typeof schema>
 
+type Props = // this is temporary
+(| {
+      type: 'edit'
+      id: string
+    }
+  | { type: 'create' }
+) &
+  Partial<Values>
+
 type State = {
   files: File[] | undefined
 }
@@ -24,22 +33,32 @@ type State = {
 export class CapsuleFormContent extends ComponentWithMutation<
   Values,
   Values,
-  object,
+  Props,
   State
 > {
-  constructor() {
-    super({ state: { files: [] } })
+  constructor(props: Props) {
+    super({ props, state: { files: [] } })
   }
 
   protected schema = () => schema
 
   protected async mutation(values: Values) {
-    // TODO: move to the next step of the creation process instead
-    const data = await client.post('/capsules', {
-      ...values,
-      visibility: 'public',
-    })
-    router.navigate(`/capsule/${data.data.id}`)
+    // TODO: move to the next step of the process instead
+    // TODO: images are not working
+    if (this.props.type === 'create') {
+      const data = await client.post('/capsules', {
+        title: values.title,
+        content: values.content,
+        visibility: 'public',
+      })
+      router.navigate(`/capsule/${data.data.id}`)
+    } else {
+      await client.put(`/capsules/${this.props.id}`, {
+        title: values.title,
+        content: values.content,
+      })
+      router.navigate(`/capsule/${this.props.id}`)
+    }
   }
 
   protected onError(message: string) {
@@ -50,27 +69,27 @@ export class CapsuleFormContent extends ComponentWithMutation<
     const title = new Input({
       label: 'Title',
       name: 'title',
-      value: this.values.title || '',
+      value: this.values.title || this.props.title || '',
       error: this.validationErrors?.title?._errors[0],
     })
     const content = new Input({
       label: 'Content',
       name: 'content',
       textarea: true,
-      value: this.values.content || '',
+      value: this.values.content || this.props.content || '',
       error: this.validationErrors?.content?._errors[0],
     })
 
-    const upload = new Upload({
-      name: 'images',
-      files: this.state.files,
-      onChange: (files) => {
-        this.setState({ files })
-      },
-      onDelete: (remainingFiles) => {
-        this.setState({ files: remainingFiles })
-      },
-    })
+    // const upload = new Upload({
+    //   name: 'images',
+    //   files: this.state.files,
+    //   onChange: (files) => {
+    //     this.setState({ files })
+    //   },
+    //   onDelete: (remainingFiles) => {
+    //     this.setState({ files: remainingFiles })
+    //   },
+    // })
 
     const form = element('form', {
       on: {
@@ -96,7 +115,7 @@ export class CapsuleFormContent extends ComponentWithMutation<
           className: 'flex flex-col gap-6',
           children: [title.element, content.element],
         }),
-        upload.element,
+        // upload.element,
       ],
     })
 
