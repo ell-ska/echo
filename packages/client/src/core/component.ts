@@ -1,7 +1,7 @@
 import { z, ZodFormattedError } from 'zod'
 import { type AxiosResponse, isAxiosError } from 'axios'
 
-import type { UserData } from '@repo/validation/data'
+import type { UserData } from '@repo/validation'
 import { auth } from '../lib/auth'
 
 type Constructor<Props, State> = { props?: Props; state?: State }

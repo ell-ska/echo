@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { registerActionSchema } from '@repo/validation/actions'
+import { registerActionSchema } from '@repo/validation'
 import { router } from '../main'
 import { auth } from '../lib/auth'
 import { ComponentWithMutation } from '../core/component'

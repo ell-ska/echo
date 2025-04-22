@@ -15,7 +15,7 @@ import {
   ValidationError,
 } from '../lib/errors'
 import { onlyDefinedValues } from '../lib/only-defined-values'
-import { capsuleResponseSchema } from '@repo/validation/data'
+import { capsuleResponseSchema } from '@repo/validation'
 
 const filterCapsuleResponse = (capsule: TCapsule) => {
   // these need to be destructured for some reason, thanks mongoose

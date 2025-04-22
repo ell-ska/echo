@@ -1,4 +1,4 @@
-import { type CapsuleData, capsuleResponseSchema } from '@repo/validation/data'
+import { type CapsuleData, capsuleResponseSchema } from '@repo/validation'
 import { Button } from '../components/button'
 import { CapsuleFormContent } from '../components/capsule-form/content'
 import { ComponentWithData } from '../core/component'

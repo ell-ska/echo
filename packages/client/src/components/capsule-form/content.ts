@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { capsuleActionSchema } from '@repo/validation/actions'
+import { capsuleActionSchema } from '@repo/validation'
 import { ComponentWithMutation } from '../../core/component'
 import { element } from '../../utils/element'
 import { Input } from '../input'
@@ -18,13 +18,14 @@ const schema = capsuleActionSchema.pick({
 type Values = z.input<typeof schema>
 
 type Props = // this is temporary
-(| {
-      type: 'edit'
-      id: string
-    }
-  | { type: 'create' }
-) &
-  Partial<Values>
+  (
+    | {
+        type: 'edit'
+        id: string
+      }
+    | { type: 'create' }
+  ) &
+    Partial<Values>
 
 type State = {
   files: File[] | undefined

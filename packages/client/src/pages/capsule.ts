@@ -2,7 +2,7 @@ import {
   type CapsuleData,
   capsuleResponseSchema,
   type UserData,
-} from '@repo/validation/data'
+} from '@repo/validation'
 import { ComponentWithData } from '../core/component'
 import { element } from '../utils/element'
 import { client } from '../lib/client'

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { CapsuleData, capsuleResponseSchema } from '@repo/validation/data'
+import { CapsuleData, capsuleResponseSchema } from '@repo/validation'
 import { ComponentWithData } from '../core/component'
 import { element } from '../utils/element'
 import { client } from '../lib/client'

@@ -4,10 +4,7 @@ import jwt from 'jsonwebtoken'
 import type { Response } from 'express'
 import type { Types } from 'mongoose'
 
-import {
-  loginActionSchema,
-  registerActionSchema,
-} from '@repo/validation/actions'
+import { loginActionSchema, registerActionSchema } from '@repo/validation'
 import { handle } from '../lib/handler'
 import { tokenSchema } from '../lib/validation'
 import { User } from '../models/user'

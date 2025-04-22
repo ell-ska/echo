@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from 'date-fns'
 
-import type { UserData } from '@repo/validation/data'
+import type { UserData } from '@repo/validation'
 import { Component } from '../core/component'
 import { Profile } from './profile'
 import { element } from '../utils/element'

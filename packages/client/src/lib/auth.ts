@@ -1,5 +1,9 @@
-import type { RegisterValues, LoginValues } from '@repo/validation/actions'
-import { tokenResponseSchema, userResponseSchema } from '@repo/validation/data'
+import {
+  type RegisterValues,
+  type LoginValues,
+  tokenResponseSchema,
+  userResponseSchema,
+} from '@repo/validation'
 import { client } from './client'
 
 class Auth {

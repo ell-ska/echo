@@ -1,12 +1,17 @@
 {
   "name": "@repo/validation",
   "type": "module",
-  "exports": {
-    "./actions": "./src/actions.ts",
-    "./data": "./src/data.ts"
+  "main": "dist/index.cjs",
+  "scripts": {
+    "build": "tsup"
   },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "types": "dist/index.d.ts",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "tsup": "^8.4.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

@@ -1,4 +1,4 @@
-import type { CapsuleData, UserData } from '@repo/validation/data'
+import type { CapsuleData, UserData } from '@repo/validation'
 
 export const isSender = (
   userId: UserData['_id'],
