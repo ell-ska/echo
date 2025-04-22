@@ -10,5 +10,8 @@
       "src": "/(.*)",
       "dest": "dist/index.cjs"
     }
-  ]
+  ],
+  "installCommand": "bun i",
+  "buildCommand": "bun run build",
+  "outputDirectory": "dist"
 }
