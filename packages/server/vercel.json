@@ -1,17 +1,14 @@
 {
-  "builds": [
-    {
-      "src": "dist/index.cjs",
-      "use": "@vercel/node"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "dist/index.cjs": {
+      "runtime": "@vercel/node"
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "dist/index.cjs"
+      "source": "/(.*)",
+      "destination": "dist/index.cjs"
     }
-  ],
-  "installCommand": "bun i",
-  "buildCommand": "bun run build",
-  "outputDirectory": "dist"
+  ]
 }
