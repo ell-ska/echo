@@ -1,14 +1,14 @@
 {
   "builds": [
     {
-      "src": "packages/server/dist/index.cjs",
+      "src": "dist/index.cjs",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "packages/server/dist/index.cjs"
+      "dest": "dist/index.cjs"
     }
   ]
 }
