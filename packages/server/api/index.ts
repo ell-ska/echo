@@ -4,7 +4,7 @@ import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import 'dotenv/config'
 
-import { db } from '../db'
+import { db } from '../db.js'
 import { router } from './routes'
 import { logger } from '../lib/logger'
 
