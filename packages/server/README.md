@@ -24,7 +24,7 @@ the echo api is organized around rest and has predictable resource oriented urls
 
 ### production
 
-`https://echo-ellskas-projects.vercel.app/`
+`https://echo-ljzf.onrender.com`
 
 ## authentication
 
@@ -120,7 +120,7 @@ _retrieves publicly available capsules_
 
 ```bash
 curl --request GET \
-  --url https://echo-ellskas-projects.vercel.app/capsules/public
+  --url https://echo-ljzf.onrender.comcapsules/public
 ```
 
 #### response example
@@ -173,7 +173,7 @@ _retrieves capsules either sent by or received by the current user_
 
 ```bash
 curl --request GET \
-  --url https://echo-ellskas-projects.vercel.app/capsules/me \
+  --url https://echo-ljzf.onrender.comcapsules/me \
   --header 'Authorization: bearer <access-token>'
 ```
 
@@ -241,7 +241,7 @@ publicly available capsules are available without authentication, for private ca
 
 ```bash
 curl --request GET \
-  --url https://echo-ellskas-projects.vercel.app/capsules/<id> \
+  --url https://echo-ljzf.onrender.comcapsules/<id> \
   --header 'Authorization: bearer <access-token>'
 ```
 
@@ -291,7 +291,7 @@ publicly available capsule images are available without authentication, for priv
 
 ```bash
 curl --request GET \
-  --url https://echo-ellskas-projects.vercel.app/capsules/<id>/images/<image-name> \
+  --url https://echo-ljzf.onrender.comcapsules/<id>/images/<image-name> \
   --header 'Authorization: bearer <access-token>'
 ```
 
@@ -339,7 +339,7 @@ authentication is required
 
 ```bash
 curl --request POST \
-  --url https://echo-ellskas-projects.vercel.app/capsules \
+  --url https://echo-ljzf.onrender.comcapsules \
   --header 'Authorization: bearer <access-token>' \
   --header 'Content-Type: multipart/form-data' \
   --form 'title=Biggest Secret of 2025' \
@@ -399,7 +399,7 @@ authentication is required
 
 ```bash
 curl --request PUT \
-  --url https://echo-ellskas-projects.vercel.app/capsules/<id> \
+  --url https://echo-ljzf.onrender.comcapsules/<id> \
   --header 'Authorization: bearer <access-token>' \
   --header 'Content-Type: multipart/form-data' \
   --form openDate=2025-03-20T14:47:26.343Z
@@ -435,7 +435,7 @@ authentication is required
 
 ```bash
 curl --request DELETE \
-  --url https://echo-ellskas-projects.vercel.app/capsules/<id> \
+  --url https://echo-ljzf.onrender.comcapsules/<id> \
   --header 'Authorization: bearer <access-token>' \
 ```
 
@@ -477,7 +477,7 @@ _register a new account_
 
 ```bash
 curl --request POST \
-  --url https://echo-ellskas-projects.vercel.app/auth/register \
+  --url https://echo-ljzf.onrender.comauth/register \
   --header 'Content-Type: multipart/form-data' \
   --form username=alexcarter \
   --form firstName=alex \
@@ -527,7 +527,7 @@ _authenticate a user_
 
 ```bash
 curl --request POST \
-  --url https://echo-ellskas-projects.vercel.app/auth/log-in \
+  --url https://echo-ljzf.onrender.comauth/log-in \
   --header 'Content-Type: application/json' \
   --data '{
 	"username": "alexcarter",
@@ -600,7 +600,7 @@ _request a new access token with the help of a refresh token_
 
 ```bash
 curl --request POST \
-  --url https://echo-ellskas-projects.vercel.app/auth/token/refresh \
+  --url https://echo-ljzf.onrender.comauth/token/refresh \
   --cookie refreshToken=<refresh-token>
 ```
 
@@ -638,7 +638,7 @@ authentication is required
 
 ```bash
 curl --request GET \
-  --url https://echo-ellskas-projects.vercel.app/users/me \
+  --url https://echo-ljzf.onrender.comusers/me \
   --header 'Authorization: bearer <access-token>'
 ```
 
@@ -670,7 +670,7 @@ _retrieve public information about a specific user_
 
 ```bash
 curl --request GET \
-  --url https://echo-ellskas-projects.vercel.app/users/<id>
+  --url https://echo-ljzf.onrender.comusers/<id>
 ```
 
 #### response example
@@ -704,7 +704,7 @@ authentication is required
 
 ```bash
 curl --request GET \
-  --url https://echo-ellskas-projects.vercel.app/users/me/image \
+  --url https://echo-ljzf.onrender.comusers/me/image \
   --header 'Authorization: bearer <access-token>'
 ```
 
@@ -733,7 +733,7 @@ _retrieve a specific users profile picture_
 
 ```bash
 curl --request GET \
-  --url https://echo-ellskas-projects.vercel.app/users/<id>/image \
+  --url https://echo-ljzf.onrender.comusers/<id>/image \
   --header 'Authorization: bearer <access-token>'
 ```
 
@@ -776,7 +776,7 @@ authentication is required
 
 ```bash
 curl --request PUT \
-  --url https://echo-ellskas-projects.vercel.app/users/me \
+  --url https://echo-ljzf.onrender.comusers/me \
   --header 'Content-Type: application/json' \
   --header 'Authorization: bearer <access-token>' \
   --form firstName=elias
@@ -804,7 +804,7 @@ authentication is required
 
 ```bash
 curl --request DELETE \
-  --url https://echo-ellskas-projects.vercel.app/users/me \
+  --url https://echo-ljzf.onrender.comusers/me \
   --header 'Authorization: bearer <access-token>' \
 ```
 
