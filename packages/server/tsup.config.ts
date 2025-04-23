@@ -9,5 +9,4 @@ export default defineConfig({
   clean: true,
   shims: true,
   dts: false,
-  external: ['@repo/validation'],
 })
