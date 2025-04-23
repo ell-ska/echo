@@ -2,7 +2,8 @@
   "name": "@repo/server",
   "type": "module",
   "scripts": {
-    "dev": "bun --hot run api/index.ts"
+    "dev": "bun --hot run api/index.ts",
+    "build": "tsup"
   },
   "dependencies": {
     "@repo/validation": "workspace:*",

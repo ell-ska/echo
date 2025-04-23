@@ -3,7 +3,7 @@ import { defineConfig } from 'tsup'
 export default defineConfig({
   entry: ['api/index.ts'],
   outDir: 'dist',
-  format: ['cjs'],
+  format: ['esm'],
   target: 'node18',
   splitting: false,
   clean: true,
