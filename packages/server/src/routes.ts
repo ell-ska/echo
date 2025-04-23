@@ -1,10 +1,10 @@
 import { Router } from 'express'
 import multer from 'multer'
 
-import { authController } from '../controller/auth'
-import { userController } from '../controller/user'
-import { capsuleController } from '../controller/capsule'
-import { imageController } from '../controller/image'
+import { authController } from './controller/auth'
+import { userController } from './controller/user'
+import { capsuleController } from './controller/capsule'
+import { imageController } from './controller/image'
 
 const upload = multer()
 
