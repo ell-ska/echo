@@ -1,6 +1,7 @@
 {
   "version": 2,
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "api",
   "functions": {
     "dist/index.js": {
       "runtime": "@vercel/node@5.1.14"

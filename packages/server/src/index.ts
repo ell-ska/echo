@@ -4,9 +4,9 @@ import helmet from 'helmet'
 import cookieParser from 'cookie-parser'
 import 'dotenv/config'
 
-import { db } from '../db'
+import { db } from './db'
 import { router } from './routes'
-import { logger } from '../lib/logger'
+import { logger } from './lib/logger'
 
 const app = express()
 app.use(
