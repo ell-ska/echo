@@ -1,7 +1,7 @@
 {
   "name": "@repo/validation",
   "type": "module",
-  "main": "dist/index.cjs",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsup"
   },
