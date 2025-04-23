@@ -2,14 +2,14 @@
   "version": 2,
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "dist": {
+    "api/index.js": {
       "runtime": "@vercel/node@5.1.14"
     }
   },
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "dist/api/index.js"
+      "destination": "api/index.js"
     }
   ]
 }
