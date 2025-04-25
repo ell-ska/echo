@@ -2,7 +2,7 @@
   "name": "echo",
   "private": true,
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --filter=!@repo/vanilla-client",
     "build": "turbo run build"
   },
   "devDependencies": {
