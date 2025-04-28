@@ -4,7 +4,6 @@ import { cn } from '../../utils/classname';
 
 @Component({
   selector: 'app-profile',
-  imports: [],
   template: `
     @if (!hasError()) {
       <img
