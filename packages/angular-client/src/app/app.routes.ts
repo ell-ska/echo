@@ -19,6 +19,16 @@ import { CreateCapsuleLayoutComponent } from './layouts/create-capsule.component
 export const routes: Routes = [
   {
     path: '',
+    component: UnauthenticatedLayoutComponent,
+    children: [
+      { path: '', component: ExplorePageComponent },
+      { path: 'sent', component: SentPageComponent },
+      { path: 'received', component: ReceivedPageComponent },
+      { path: 'capsule/:id', component: CapsulePageComponent },
+    ],
+  },
+  {
+    path: '',
     component: CreateCapsuleLayoutComponent,
     children: [
       { path: 'capsule/create', component: CreateCapsulePageComponent },
@@ -46,14 +56,8 @@ export const routes: Routes = [
     ],
   },
   {
-    path: '',
+    path: '**',
     component: UnauthenticatedLayoutComponent,
-    children: [
-      { path: '', component: ExplorePageComponent },
-      { path: 'sent', component: SentPageComponent },
-      { path: 'received', component: ReceivedPageComponent },
-      { path: 'capsule/:id', component: CapsulePageComponent },
-      { path: '**', component: NotFoundPageComponent },
-    ],
+    children: [{ path: '', component: NotFoundPageComponent }],
   },
 ];
