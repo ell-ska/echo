@@ -23,6 +23,7 @@
         "@angular/platform-browser-dynamic": "^19.2.0",
         "@angular/router": "^19.2.0",
         "@tailwindcss/postcss": "^4.1.4",
+        "date-fns": "^4.1.0",
         "lucide-angular": "^0.503.0",
         "postcss": "^8.5.3",
         "rxjs": "~7.8.0",
