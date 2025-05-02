@@ -24,4 +24,8 @@
   *:focus-visible {
     @apply outline-1;
   }
+
+  app-unauthenticated-layout {
+    @apply w-full;
+  }
 }
