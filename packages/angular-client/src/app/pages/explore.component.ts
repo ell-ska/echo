@@ -7,13 +7,14 @@ import { type CapsuleData } from '@repo/validation/data';
 import { CapsuleService } from '../services/capsule.service';
 import { CapsuleComponent } from '../components/capsule.component';
 import { CountdownComponent } from '../components/countdown.component';
+import { TabsComponent } from '../components/tabs.component';
 
 @Component({
   selector: 'app-explore-page',
-  imports: [AsyncPipe, CapsuleComponent, CountdownComponent],
+  imports: [AsyncPipe, CapsuleComponent, CountdownComponent, TabsComponent],
   template: `
     <main
-      class="mt-header-sm md:mt-header-md pt-4 px-4 max-w-sm flex flex-col gap-6"
+      class="mt-header-sm md:mt-header-md pt-4 px-4 max-w-sm flex flex-col gap-6 w-full"
     >
       @for (capsule of capsules$ | async; track capsule._id) {
         @if (capsule.state === 'opened') {
@@ -36,6 +37,14 @@ import { CountdownComponent } from '../components/countdown.component';
           />
         }
       }
+
+      <app-tabs
+        [tabs]="[
+          { label: 'Opened', routerLink: '/', params: { type: 'opened' } },
+          { label: 'Sealed', routerLink: '/', params: { type: 'sealed' } },
+        ]"
+        classes="fixed bottom-8 left-1/2 -translate-x-1/2"
+      />
     </main>
   `,
 })
@@ -46,7 +55,9 @@ export class ExplorePageComponent {
   private route = inject(ActivatedRoute);
 
   ngOnInit() {
-    const type = this.route.snapshot.queryParamMap.get('type');
-    this.capsules$ = this.capsuleService.getPublic({ type: type || 'opened' });
+    this.route.queryParamMap.subscribe((params) => {
+      const type = params.get('type') || 'opened';
+      this.capsules$ = this.capsuleService.getPublic({ type });
+    });
   }
 }

@@ -26,6 +26,6 @@
   }
 
   app-unauthenticated-layout {
-    @apply w-full;
+    @apply w-full *:flex *:flex-col *:items-center *:w-full;
   }
 }
