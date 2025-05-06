@@ -39,7 +39,7 @@ import { DatePipe } from '../pipes/date.pipe';
               />
             }
           </div>
-          <time [attr.datetime]="openDate()">
+          <time [attr.datetime]="openDate()" class="text-sm text-zinc-600">
             {{ openDate() | date: 'distance-to-now' }}
           </time>
         </div>
