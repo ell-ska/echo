@@ -10,7 +10,7 @@ import { ButtonComponent } from '../components/ui/button.component';
   template: `
     <app-header>
       <a href="/" class="text-lg font-black">echo</a>
-      <app-button label="Log in" size="sm" href="/auth/log-in" />
+      <app-button label="Log in" size="sm" href="/log-in" />
     </app-header>
     <router-outlet />
   `,

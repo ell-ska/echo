@@ -1,25 +1,31 @@
 import { Component, input } from '@angular/core';
+import {
+  FormControl,
+  ReactiveFormsModule,
+  type ValidationErrors,
+} from '@angular/forms';
 
 import { cn } from '../../../utils/classname';
 
 @Component({
   selector: 'app-input',
+  imports: [ReactiveFormsModule],
   template: `
     <div class="group relative flex flex-col gap-1">
       @if (textarea()) {
         <textarea
+          [formControl]="control()"
           [name]="name()"
           [id]="name()"
-          [value]="value()"
           [placeholder]="label()"
           [class]="inputClasses"
         ></textarea>
       } @else {
         <input
+          [formControl]="control()"
           [type]="type()"
           [name]="name()"
           [id]="name()"
-          [value]="value()"
           [placeholder]="label()"
           [class]="inputClasses"
         />
@@ -39,19 +45,19 @@ import { cn } from '../../../utils/classname';
         {{ label() }}
       </label>
 
-      @if (error()) {
+      @if (error() && (control().dirty || control().touched)) {
         <span class="text-sm text-warning-bright">{{ error() }}</span>
       }
     </div>
   `,
 })
 export class InputComponent {
+  control = input.required<FormControl>();
   label = input.required<string>();
   name = input.required<string>();
-  error = input<string>();
+  error = input<string | null>(null);
   textarea = input(false);
   type = input<HTMLElementTagNameMap['input']['type']>('text');
-  value = input<HTMLElementTagNameMap['input']['value']>('');
 
   cn = cn;
   inputClasses = cn(
@@ -61,3 +67,15 @@ export class InputComponent {
     this.error() && 'border-warning-bright',
   );
 }
+
+export const getValidationError = (
+  errors: ValidationErrors | null,
+  messages: Record<string, string>,
+) => {
+  if (!errors) {
+    return null;
+  }
+
+  const key = Object.keys(errors)[0];
+  return messages[key];
+};

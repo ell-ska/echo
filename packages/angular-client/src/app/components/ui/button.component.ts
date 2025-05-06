@@ -5,7 +5,7 @@ import { LucideAngularModule, type LucideIconData } from 'lucide-angular';
 import { cn } from '../../../utils/classname';
 
 const variants = cva(
-  'flex gap-2 items-center justify-center rounded-full border border-transparent cursor-pointer whitespace-nowrap transition',
+  'flex gap-2 items-center justify-center rounded-full border border-transparent cursor-pointer whitespace-nowrap w-full transition',
   {
     variants: {
       variant: {

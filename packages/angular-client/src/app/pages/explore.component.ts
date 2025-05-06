@@ -13,9 +13,7 @@ import { TabsComponent } from '../components/tabs.component';
   selector: 'app-explore-page',
   imports: [AsyncPipe, CapsuleComponent, CountdownComponent, TabsComponent],
   template: `
-    <main
-      class="mt-header-sm md:mt-header-md pt-4 px-4 max-w-sm flex flex-col gap-6 w-full"
-    >
+    <main class="main max-w-sm gap-6">
       @for (capsule of capsules$ | async; track capsule._id) {
         @if (capsule.state === 'opened') {
           <app-capsule
