@@ -20,7 +20,7 @@ import { ToastService } from '../services/toast.service';
   selector: 'app-create-account-page',
   imports: [ReactiveFormsModule, RouterLink, InputComponent, ButtonComponent],
   template: `
-    <main class="main items-center max-w-xl gap-6 md:gap-2 h-full">
+    <main class="main main-auth">
       <div class="grow w-full flex flex-col items-center mt-[10vh] gap-8">
         <h1 class="space-x-2 text-2xl">
           Welcome to <span class="font-black">echo</span> !
@@ -113,7 +113,7 @@ export class CreateAccountPageComponent {
     },
   );
 
-  getValidationError(field: string) {
+  getValidationError(field: keyof typeof this.form.controls) {
     switch (field) {
       case 'username':
         return getValidationError(this.form.controls.username.errors, {
@@ -139,8 +139,6 @@ export class CreateAccountPageComponent {
           required: 'Password confirmation is required',
           mismatch: 'Passwords do not match',
         });
-      default:
-        return null;
     }
   }
 
