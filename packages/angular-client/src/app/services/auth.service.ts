@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { tap } from 'rxjs';
 
 import type { RegisterValues } from '@repo/validation/actions';
 import type { TokenData } from '@repo/validation/data';
-import { tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
