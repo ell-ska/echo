@@ -13,6 +13,8 @@ export const tokenResponseSchema = z.object({
   accessToken: z.string(),
 })
 
+export type TokenData = z.infer<typeof tokenResponseSchema>
+
 export const userResponseSchema = z.object({
   _id,
   username: z.string(),
