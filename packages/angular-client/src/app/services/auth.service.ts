@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { tap } from 'rxjs';
+import { catchError, of, tap } from 'rxjs';
 
 import type { LoginValues, RegisterValues } from '@repo/validation/actions';
 import type { TokenData, UserData } from '@repo/validation/data';
@@ -34,14 +34,13 @@ export class AuthService {
   }
 
   refresh() {
-    this.http.post<TokenData>('/auth/token/refresh', null).subscribe({
-      next: ({ accessToken }) => {
-        this.accessToken = accessToken;
-      },
-      error: () => {
+    return this.http.post<TokenData>('/auth/token/refresh', null).pipe(
+      this.accessTokenTap,
+      catchError(() => {
         this.accessToken = null;
-      },
-    });
+        return of(null);
+      }),
+    );
   }
 
   getCurrentUser() {
