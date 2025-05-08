@@ -2,6 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, of } from 'rxjs';
 
+import { environment } from '../../environments/environment';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -24,10 +26,10 @@ export class ImageService {
   }
 
   user(id: string) {
-    return `/users/${id}/image`;
+    return `${environment.serverUrl}/users/${id}/image`;
   }
 
   me() {
-    return '/users/me/image';
+    return `${environment.serverUrl}/users/me/image`;
   }
 }
