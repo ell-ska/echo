@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 
-import { UnauthenticatedLayoutComponent } from './layouts/unauthenticated.component';
 import { ExplorePageComponent } from './pages/explore.component';
 import { SentPageComponent } from './pages/sent.component';
 import { ReceivedPageComponent } from './pages/received.component';
@@ -13,13 +12,13 @@ import { CreateAccountPageComponent } from './pages/create-account.component';
 import { PersonalizeAccountPageComponent } from './pages/personalize-account.component';
 import { LogInPageComponent } from './pages/log-in.component';
 import { NotFoundPageComponent } from './pages/not-found.component';
-import { AuthenticatedLayoutComponent } from './layouts/authenticated.component';
+import { MainLayoutComponent } from './layouts/main.component';
 import { CreateCapsuleLayoutComponent } from './layouts/create-capsule.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: UnauthenticatedLayoutComponent,
+    component: MainLayoutComponent,
     children: [
       { path: '', component: ExplorePageComponent },
       { path: 'sent', component: SentPageComponent },
@@ -36,7 +35,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    component: AuthenticatedLayoutComponent,
+    component: MainLayoutComponent,
     children: [
       { path: 'capsule/:id/edit', component: EditCapsulePageComponent },
       { path: 'profile', component: ProfilePageComponent },
@@ -45,7 +44,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    component: UnauthenticatedLayoutComponent,
+    component: MainLayoutComponent,
     children: [
       { path: 'create-account', component: CreateAccountPageComponent },
       {
@@ -57,7 +56,7 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    component: UnauthenticatedLayoutComponent,
+    component: MainLayoutComponent,
     children: [{ path: '', component: NotFoundPageComponent }],
   },
 ];

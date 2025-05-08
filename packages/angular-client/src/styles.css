@@ -27,7 +27,8 @@
 
   app-unauthenticated-layout,
   app-create-account-page,
-  app-log-in-page {
+  app-log-in-page,
+  app-explore-page {
     @apply w-full grow flex flex-col items-center;
   }
 
