@@ -1,11 +1,11 @@
+import { inject } from '@angular/core';
 import {
   type HttpErrorResponse,
   type HttpInterceptorFn,
 } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { catchError, from, switchMap, throwError } from 'rxjs';
 
 import { AuthService } from '../services/auth.service';
-import { catchError, from, switchMap, throwError } from 'rxjs';
 
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
