@@ -43,25 +43,25 @@ export class AuthService {
   }
 
   refresh() {
+    if (this.isRefetching) return of(null);
+    this.isRefetching = true;
+
     return this.http.post<TokenData>('/auth/token/refresh', null).pipe(
       this.accessTokenTap,
       catchError(() => {
         this.clearAccessToken();
         return of(null);
       }),
+      finalize(() => {
+        this.isRefetching = false;
+      }),
     );
   }
 
   getCurrentUser() {
-    if (this.isRefetching) return of(null);
-    this.isRefetching = true;
-
     return this.http.get<UserData>('/users/me').pipe(
       catchError(() => {
         return of(null);
-      }),
-      finalize(() => {
-        this.isRefetching = false;
       }),
     );
   }
