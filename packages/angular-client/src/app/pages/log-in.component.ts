@@ -14,8 +14,8 @@ import { ToastService } from '../services/toast.service';
 import {
   getValidationError,
   InputComponent,
-} from '../components/ui/input.component';
-import { ButtonComponent } from '../components/ui/button.component';
+} from '../components/input.component';
+import { ButtonComponent } from '../components/button.component';
 
 @Component({
   selector: 'app-log-in-page',

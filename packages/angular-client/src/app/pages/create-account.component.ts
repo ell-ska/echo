@@ -11,8 +11,8 @@ import type { RegisterValues } from '@repo/validation/actions';
 import {
   getValidationError,
   InputComponent,
-} from '../components/ui/input.component';
-import { ButtonComponent } from '../components/ui/button.component';
+} from '../components/input.component';
+import { ButtonComponent } from '../components/button.component';
 import { AuthService } from '../services/auth.service';
 import { ToastService } from '../services/toast.service';
 
