@@ -12,7 +12,7 @@ import { cn } from '../../utils/classname';
         <a
           [routerLink]="tab.routerLink"
           [queryParams]="tab.params"
-          [routerLinkActive]="'!bg-slate-800 !text-white hover:!bg-slate-700'"
+          routerLinkActive="!bg-slate-800 !text-white hover:!bg-slate-700"
           [routerLinkActiveOptions]="{ exact: true }"
           class="py-2 px-3 text-xs text-zinc-600 bg-white rounded-full transition hover:bg-slate-100"
           >{{ tab.label }}</a
