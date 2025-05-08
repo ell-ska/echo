@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { catchError, of, tap } from 'rxjs';
+import { catchError, finalize, of, tap } from 'rxjs';
 
 import type { LoginValues, RegisterValues } from '@repo/validation/actions';
 import type { TokenData, UserData } from '@repo/validation/data';
@@ -10,10 +10,19 @@ import type { TokenData, UserData } from '@repo/validation/data';
 })
 export class AuthService {
   private http = inject(HttpClient);
-  private accessToken: string | null = null;
+  private accessTokenKey = 'access-token';
+  private isRefetching = false;
+
+  setAccessToken(accessToken: string) {
+    localStorage.setItem(this.accessTokenKey, accessToken);
+  }
+
+  clearAccessToken() {
+    localStorage.removeItem(this.accessTokenKey);
+  }
 
   getAccessToken() {
-    return this.accessToken;
+    return localStorage.getItem(this.accessTokenKey);
   }
 
   register(values: RegisterValues) {
@@ -29,7 +38,7 @@ export class AuthService {
   }
 
   logout() {
-    this.accessToken = null;
+    this.clearAccessToken();
     return this.http.delete('/auth/log-out');
   }
 
@@ -37,24 +46,27 @@ export class AuthService {
     return this.http.post<TokenData>('/auth/token/refresh', null).pipe(
       this.accessTokenTap,
       catchError(() => {
-        this.accessToken = null;
+        this.clearAccessToken();
         return of(null);
       }),
     );
   }
 
   getCurrentUser() {
-    return this.http.get<UserData>('/users/me').subscribe({
-      next: (data) => {
-        return data;
-      },
-      error: () => {
-        return null;
-      },
-    });
+    if (this.isRefetching) return of(null);
+    this.isRefetching = true;
+
+    return this.http.get<UserData>('/users/me').pipe(
+      catchError(() => {
+        return of(null);
+      }),
+      finalize(() => {
+        this.isRefetching = false;
+      }),
+    );
   }
 
   private accessTokenTap = tap(({ accessToken }) => {
-    this.accessToken = accessToken;
+    this.setAccessToken(accessToken);
   });
 }

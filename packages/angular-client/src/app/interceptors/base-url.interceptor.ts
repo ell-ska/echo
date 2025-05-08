@@ -11,6 +11,7 @@ export const baseUrlInterceptor: HttpInterceptorFn = (req, next) => {
 
   const apiReq = req.clone({
     url: `${environment.serverUrl.replace(leadingAndTrailingSlashRegex, '')}/${req.url.replace(leadingAndTrailingSlashRegex, '')}`,
+    withCredentials: true,
   });
   return next(apiReq);
 };
