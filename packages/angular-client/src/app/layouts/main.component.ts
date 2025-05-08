@@ -2,7 +2,7 @@ import { Component, inject, input } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 import { HeaderComponent } from '../components/header.component';
-import { ButtonComponent } from '../components/ui/button.component';
+import { ButtonComponent } from '../components/button.component';
 import { NavigationComponent } from '../components/navigation/navigation.component';
 import { UserData } from '@repo/validation/data';
 import { Observable } from 'rxjs';

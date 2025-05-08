@@ -1,7 +1,7 @@
 import { Component, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { intervalToDuration, isBefore } from 'date-fns';
-import { ButtonComponent } from './ui/button.component';
+import { ButtonComponent } from './button.component';
 
 @Component({
   selector: 'app-countdown',

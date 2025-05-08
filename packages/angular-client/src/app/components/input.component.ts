@@ -5,7 +5,7 @@ import {
   type ValidationErrors,
 } from '@angular/forms';
 
-import { cn } from '../../../utils/classname';
+import { cn } from '../../utils/classname';
 
 @Component({
   selector: 'app-input',
