@@ -1,27 +1,29 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, computed, inject, input, signal } from '@angular/core';
 
+import { ImageService } from '../services/image.service';
+import { ImageComponent } from './image.component';
 import { cn } from '../../utils/classname';
 
 @Component({
   selector: 'app-profile',
   template: `
-    @if (!hasError()) {
-      <img
-        [src]="src()"
-        (error)="onError()"
-        [className]="getClasses('image')"
-      />
-    } @else {
-      <div [className]="getClasses('initials')">{{ initials() }}</div>
-    }
+    <app-image [src]="src()" [alt]="alt()" [classes]="getClasses('image')">
+      <div fallback [className]="getClasses('initials')">
+        {{ initials() }}
+      </div>
+    </app-image>
   `,
+  imports: [ImageComponent],
 })
 export class ProfileComponent {
+  id = input.required<string>();
+  username = input.required<string>();
   size = input<'md' | 'lg'>('md');
   initials = input<string>();
-  src = input<string>();
 
-  protected hasError = signal(false);
+  private imageService = inject(ImageService);
+  protected src = signal<string | null>(null);
+  protected alt = computed(() => `${this.username}'s profile picture`);
 
   protected getClasses(type: 'image' | 'initials') {
     return cn(
@@ -34,7 +36,11 @@ export class ProfileComponent {
     );
   }
 
-  protected onError() {
-    this.hasError.set(true);
+  ngOnInit() {
+    if (this.id() === 'me') {
+      this.src.set(this.imageService.me());
+    } else {
+      this.src.set(this.imageService.user(this.id()));
+    }
   }
 }
