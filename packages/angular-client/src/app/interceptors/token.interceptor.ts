@@ -12,20 +12,25 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
 
   const accessToken = authService.getAccessToken();
 
+  let authReq = req;
   if (accessToken) {
-    req.headers.set('Authorization', `Bearer ${accessToken}`);
+    authReq = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
   }
 
-  return next(req).pipe(
+  return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       if (
         (error.status === 401 || error.status === 403) &&
-        !req.headers.has('X-Retry')
+        !authReq.headers.has('X-Retry')
       ) {
         return from(authService.refresh()).pipe(
           switchMap(() => {
             const accessToken = authService.getAccessToken();
-            const retryReq = req.clone({
+            const retryReq = authReq.clone({
               setHeaders: {
                 Authorization: `Bearer ${accessToken}`,
                 'X-Retry': 'true',

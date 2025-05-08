@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
+import { v4 as uuid } from 'uuid'
 import type { Response } from 'express'
 import type { Types } from 'mongoose'
 
@@ -23,12 +24,20 @@ const tokenResponse = async ({
   res: Response
   status?: 200 | 201
 }) => {
-  const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET!, {
-    expiresIn: '15m',
-  })
-  const refreshToken = jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET!, {
-    expiresIn: '7d',
-  })
+  const accessToken = jwt.sign(
+    { userId, jit: uuid() },
+    process.env.ACCESS_TOKEN_SECRET!,
+    {
+      expiresIn: '15m',
+    },
+  )
+  const refreshToken = jwt.sign(
+    { userId, jit: uuid() },
+    process.env.REFRESH_TOKEN_SECRET!,
+    {
+      expiresIn: '7d',
+    },
+  )
 
   const databaseRefreshToken = new RefreshToken({ token: refreshToken })
 
