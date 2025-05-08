@@ -19,9 +19,11 @@ import { AsyncPipe } from '@angular/common';
     NavigationComponent,
   ],
   template: `
-    <app-header>
+    <app-header [class.md:hidden]="user$ | async">
       <a href="/" class="text-lg font-black">echo</a>
-      <app-button label="Log in" size="sm" href="/log-in" />
+      @if (!(user$ | async)) {
+        <app-button label="Log in" size="sm" href="/log-in" />
+      }
     </app-header>
     <router-outlet />
     @if (user$ | async) {
