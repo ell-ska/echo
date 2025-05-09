@@ -1,22 +1,24 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AsyncPipe } from '@angular/common';
+import { Observable } from 'rxjs';
 
+import type { UserData } from '@repo/validation/data';
+import { AuthService } from '../services/auth.service';
 import { HeaderComponent } from '../components/header.component';
 import { ButtonComponent } from '../components/button.component';
 import { NavigationComponent } from '../components/navigation/navigation.component';
-import { UserData } from '@repo/validation/data';
-import { Observable } from 'rxjs';
-import { AuthService } from '../services/auth.service';
-import { AsyncPipe } from '@angular/common';
+import { SidebarComponent } from '../components/sidebar/sidebar.component';
 
 @Component({
-  selector: 'app-unauthenticated-layout',
+  selector: 'app-main-layout',
   imports: [
     AsyncPipe,
     RouterOutlet,
     HeaderComponent,
     ButtonComponent,
     NavigationComponent,
+    SidebarComponent,
   ],
   template: `
     <app-header [class.md:hidden]="user$ | async">
@@ -25,6 +27,7 @@ import { AsyncPipe } from '@angular/common';
         <app-button label="Log in" size="sm" href="/log-in" />
       }
     </app-header>
+    <app-sidebar [class.hidden]="!(user$ | async)" />
     <router-outlet />
     @if (user$ | async) {
       <app-navigation
