@@ -3,9 +3,7 @@ import { Routes } from '@angular/router';
 import { ExplorePageComponent } from './pages/explore.component';
 import { SentPageComponent } from './pages/sent.component';
 import { ReceivedPageComponent } from './pages/received.component';
-import { CreateCapsulePageComponent } from './pages/create-capsule.component';
 import { CapsulePageComponent } from './pages/capsule.component';
-import { EditCapsulePageComponent } from './pages/edit-capsule.component';
 import { ProfilePageComponent } from './pages/profile.component';
 import { EditProfilePageComponent } from './pages/edit-profile.component';
 import { CreateAccountPageComponent } from './pages/create-account.component';
@@ -13,7 +11,19 @@ import { PersonalizeAccountPageComponent } from './pages/personalize-account.com
 import { LogInPageComponent } from './pages/log-in.component';
 import { NotFoundPageComponent } from './pages/not-found.component';
 import { MainLayoutComponent } from './layouts/main.component';
-import { CreateCapsuleLayoutComponent } from './layouts/create-capsule.component';
+import { CapsuleEditorLayoutComponent } from './layouts/capsule-editor.component';
+import { ContentComponent } from './pages/capsule-wizard/content.component';
+import { VisibilityComponent } from './pages/capsule-wizard/visibility.component';
+import { ReceiversComponent } from './pages/capsule-wizard/receivers.component';
+import { OpenDateComponent } from './pages/capsule-wizard/open-date.component';
+
+const wizardRoutes: Routes = [
+  { path: 'content', component: ContentComponent },
+  { path: 'visibility', component: VisibilityComponent },
+  { path: 'receivers', component: ReceiversComponent },
+  { path: 'open-date', component: OpenDateComponent },
+  { path: '', redirectTo: 'content', pathMatch: 'full' },
+];
 
 export const routes: Routes = [
   {
@@ -27,9 +37,16 @@ export const routes: Routes = [
   },
   {
     path: '',
-    component: CreateCapsuleLayoutComponent,
+    component: CapsuleEditorLayoutComponent,
     children: [
-      { path: 'capsule/create', component: CreateCapsulePageComponent },
+      {
+        path: 'capsule/create',
+        children: wizardRoutes,
+      },
+      {
+        path: 'capsule/:id/edit',
+        children: wizardRoutes,
+      },
     ],
   },
   {
@@ -37,7 +54,6 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     children: [
       { path: 'capsule/:id', component: CapsulePageComponent },
-      { path: 'capsule/:id/edit', component: EditCapsulePageComponent },
       { path: 'profile', component: ProfilePageComponent },
       { path: 'profile/edit', component: EditProfilePageComponent },
     ],
