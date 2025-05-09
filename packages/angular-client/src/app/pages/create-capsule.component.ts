@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-capsule-editor-layout',
+  selector: 'app-create-capsule-page',
   imports: [],
   template: ` <p>create-capsule works!</p> `,
 })
-export class CapsuleEditorLayoutComponent {}
+export class CreateCapsulePageComponent {}
