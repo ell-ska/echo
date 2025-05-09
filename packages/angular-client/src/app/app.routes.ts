@@ -23,7 +23,6 @@ export const routes: Routes = [
       { path: '', component: ExplorePageComponent },
       { path: 'sent', component: SentPageComponent },
       { path: 'received', component: ReceivedPageComponent },
-      { path: 'capsule/:id', component: CapsulePageComponent },
     ],
   },
   {
@@ -37,6 +36,7 @@ export const routes: Routes = [
     path: '',
     component: MainLayoutComponent,
     children: [
+      { path: 'capsule/:id', component: CapsulePageComponent },
       { path: 'capsule/:id/edit', component: EditCapsulePageComponent },
       { path: 'profile', component: ProfilePageComponent },
       { path: 'profile/edit', component: EditProfilePageComponent },

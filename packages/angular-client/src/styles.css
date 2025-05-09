@@ -11,6 +11,7 @@
 
   --spacing-header-sm: calc(var(--spacing) * 16);
   --spacing-header-md: calc(var(--spacing) * 20);
+  --spacing-sidebar: calc(var(--spacing) * 60);
 
   --shadow-float: 0 8px 32px #27272a1f;
 }
@@ -25,12 +26,16 @@
     @apply outline-1;
   }
 
-  app-unauthenticated-layout,
+  app-main-layout,
   app-create-account-page,
   app-log-in-page,
   app-explore-page,
   app-capsule-page {
     @apply w-full grow flex flex-col items-center;
+  }
+
+  app-main-layout:has(app-sidebar:not(.hidden)) {
+    @apply md:flex-row;
   }
 
   app-profile {
