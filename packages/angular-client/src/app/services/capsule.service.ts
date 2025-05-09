@@ -16,4 +16,12 @@ export class CapsuleService {
       params,
     });
   }
+
+  getOne({ id }: { id: string }) {
+    return this.http.get<CapsuleData>(`/capsules/${id}`);
+  }
+
+  delete({ id }: { id: string }) {
+    return this.http.delete(`/capsules/${id}`);
+  }
 }
