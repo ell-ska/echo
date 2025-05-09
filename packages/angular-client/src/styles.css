@@ -28,8 +28,13 @@
   app-unauthenticated-layout,
   app-create-account-page,
   app-log-in-page,
-  app-explore-page {
+  app-explore-page,
+  app-capsule-page {
     @apply w-full grow flex flex-col items-center;
+  }
+
+  app-profile {
+    @apply flex shrink-0;
   }
 
   .main {
