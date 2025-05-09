@@ -17,11 +17,12 @@ import { VisibilityComponent } from './pages/capsule-wizard/visibility.component
 import { ReceiversComponent } from './pages/capsule-wizard/receivers.component';
 import { OpenDateComponent } from './pages/capsule-wizard/open-date.component';
 
-const wizardRoutes = [
+const wizardRoutes: Routes = [
   { path: 'content', component: ContentComponent },
   { path: 'visibility', component: VisibilityComponent },
   { path: 'receivers', component: ReceiversComponent },
   { path: 'open-date', component: OpenDateComponent },
+  { path: '', redirectTo: 'content', pathMatch: 'full' },
 ];
 
 export const routes: Routes = [
