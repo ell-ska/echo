@@ -22,45 +22,47 @@ type Image = {
   selector: 'app-upload-multiple',
   imports: [ButtonComponent, ImageComponent],
   template: `
-    @if (images().length > 0) {
-      <div class="flex flex-wrap gap-2">
-        @for (image of images(); track image.id) {
-          <div class="relative">
-            <app-image
-              [src]="image.preview"
-              [alt]="'Preview of ' + image.preview"
-              classes="h-28 object-cover border border-white rounded-2xl"
-            />
-            <app-button
-              [icon]="x"
-              size="sm"
-              class="absolute -top-1 -right-1"
-              type="button"
-              (onClick)="deleteImage(image.id)"
-            />
-          </div>
-        }
-      </div>
-    }
+    <div class="flex flex-col items-start gap-2">
+      @if (images().length > 0) {
+        <div class="flex flex-wrap gap-2">
+          @for (image of images(); track image.id) {
+            <div class="relative">
+              <app-image
+                [src]="image.preview"
+                [alt]="'Preview of ' + image.preview"
+                classes="h-28 object-cover border border-white rounded-2xl"
+              />
+              <app-button
+                [icon]="x"
+                size="sm"
+                class="absolute -top-1 -right-1"
+                type="button"
+                (onClick)="deleteImage(image.id)"
+              />
+            </div>
+          }
+        </div>
+      }
 
-    <label [for]="name()" class="sr-only">{{ label() }}</label>
-    <input
-      #input
-      hidden
-      type="file"
-      accept="image/*"
-      multiple
-      [name]="name()"
-      [id]="name()"
-      (change)="handleFileChange()"
-    />
-    <app-button
-      label="Upload image"
-      size="sm"
-      variant="secondary"
-      type="button"
-      (onClick)="triggerInputClick()"
-    />
+      <label [for]="name()" class="sr-only">{{ label() }}</label>
+      <input
+        #input
+        hidden
+        type="file"
+        accept="image/*"
+        multiple
+        [name]="name()"
+        [id]="name()"
+        (change)="handleFileChange()"
+      />
+      <app-button
+        label="Upload image"
+        size="sm"
+        variant="secondary"
+        type="button"
+        (onClick)="triggerInputClick()"
+      />
+    </div>
   `,
 })
 export class MultipleComponent {

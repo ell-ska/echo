@@ -27,10 +27,12 @@
   }
 
   app-main-layout,
+  app-capsule-editor-layout,
   app-create-account-page,
   app-log-in-page,
   app-explore-page,
-  app-capsule-page {
+  app-capsule-page,
+  app-content {
     @apply w-full grow flex flex-col items-center;
   }
 
@@ -48,5 +50,9 @@
 
   .main-auth {
     @apply items-center max-w-xl gap-6 md:gap-2 h-full;
+  }
+
+  .capsule-editor-navigation {
+    @apply fixed left-4 right-4 mx-auto bottom-8 flex flex-col items-center gap-2 max-w-sm *:w-full md:flex-row md:justify-end md:max-w-5xl md:*:w-auto;
   }
 }
