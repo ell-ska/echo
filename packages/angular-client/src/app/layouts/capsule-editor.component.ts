@@ -1,13 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { startWith } from 'rxjs';
 import { ChevronLeft, X } from 'lucide-angular';
 
 import { CapsuleEditorService } from '../services/capsule-editor.service';
 import { HeaderComponent } from '../components/header.component';
 import { ButtonComponent } from '../components/button.component';
-
-const defaultTitle = 'Untitled capsule';
 
 @Component({
   selector: 'app-capsule-editor-layout',
@@ -23,15 +20,16 @@ const defaultTitle = 'Untitled capsule';
           (onClick)="capsuleEditor.back()"
         />
       }
-      <h1 class="font-bold text-center truncate">{{ title() }}</h1>
+      <h1 class="font-bold text-center truncate">
+        {{ capsuleEditor.title() }}
+      </h1>
     </app-header>
-    <main class="main">
+    <main class="main max-w-sm w-full">
       <router-outlet />
     </main>
   `,
 })
 export class CapsuleEditorLayoutComponent {
-  title = signal(defaultTitle);
   x = X;
   chevronLeft = ChevronLeft;
 
@@ -39,16 +37,5 @@ export class CapsuleEditorLayoutComponent {
 
   ngOnInit() {
     this.capsuleEditor.redirectToLastStep();
-
-    this.capsuleEditor.form.controls.title.valueChanges
-      .pipe(
-        startWith(this.capsuleEditor.form.controls.title.value || defaultTitle),
-      )
-      .subscribe((value) => {
-        if (!value) {
-          return this.title.set(defaultTitle);
-        }
-        this.title.set(value);
-      });
   }
 }

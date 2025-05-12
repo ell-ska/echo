@@ -1,7 +1,12 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged, Subscription } from 'rxjs';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  startWith,
+  Subscription,
+} from 'rxjs';
 import { isFuture } from 'date-fns';
 
 import { getValidationError } from '../components/input.component';
@@ -26,20 +31,23 @@ const steps = {
 
 type Step = keyof typeof steps;
 
+const defaultTitle = 'Untitled capsule';
+
 @Injectable({
   providedIn: 'root',
 })
 export class CapsuleEditorService {
+  title = signal(defaultTitle);
   images = signal<File[] | null>(null);
 
   form = new FormGroup({
-    title: new FormControl(null, [
+    title: new FormControl('', [
       Validators.required,
       Validators.minLength(1),
       Validators.maxLength(60),
     ]),
-    content: new FormControl(null, [Validators.minLength(1)]),
-    visibility: new FormControl(null, [
+    content: new FormControl('', [Validators.minLength(1)]),
+    visibility: new FormControl('', [
       (control) => {
         enum Visibility {
           public = 'public',
@@ -66,6 +74,7 @@ export class CapsuleEditorService {
 
   constructor() {
     this.initStorageSync();
+    this.initTitleSync();
   }
 
   private initStorageSync() {
@@ -85,6 +94,17 @@ export class CapsuleEditorService {
       )
       .subscribe((value) => {
         localStorage.setItem(storageKey, JSON.stringify(value));
+      });
+  }
+
+  private initTitleSync() {
+    this.form.controls.title.valueChanges
+      .pipe(startWith(this.form.controls.title.value || defaultTitle))
+      .subscribe((value) => {
+        if (!value) {
+          return this.title.set(defaultTitle);
+        }
+        this.title.set(value);
       });
   }
 

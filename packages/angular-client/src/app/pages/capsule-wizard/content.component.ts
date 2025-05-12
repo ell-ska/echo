@@ -15,35 +15,34 @@ import { ButtonComponent } from '../../components/button.component';
     ButtonComponent,
   ],
   template: `
-    <form [formGroup]="form" class="w-full max-w-sm flex flex-col gap-8">
+    <form [formGroup]="editor.form" class="flex flex-col gap-8">
       <div class="flex flex-col gap-6">
         <app-input
-          [control]="form.controls.title"
+          [control]="editor.form.controls.title"
           name="title"
           label="Title"
-          [error]="this.capsuleEditor.getValidationError('title')"
+          [error]="editor.getValidationError('title')"
         />
         <app-input
           [textarea]="true"
-          [control]="form.controls.content"
+          [control]="editor.form.controls.content"
           name="content"
           label="Content"
-          [error]="this.capsuleEditor.getValidationError('content')"
+          [error]="editor.getValidationError('content')"
         />
       </div>
       <app-upload-multiple
         name="images"
         label="Images"
-        (files)="capsuleEditor.images.set($event)"
+        (files)="editor.images.set($event)"
       />
     </form>
 
     <nav class="capsule-editor-navigation">
-      <app-button label="Next" (onClick)="capsuleEditor.next()" />
+      <app-button label="Next" (onClick)="editor.next()" />
     </nav>
   `,
 })
 export class ContentComponent {
-  capsuleEditor = inject(CapsuleEditorService);
-  form = this.capsuleEditor.form;
+  editor = inject(CapsuleEditorService);
 }
