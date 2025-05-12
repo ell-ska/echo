@@ -21,7 +21,10 @@ import { SidebarComponent } from '../components/sidebar/sidebar.component';
     SidebarComponent,
   ],
   template: `
-    <app-header [class.md:hidden]="user$ | async">
+    <app-header
+      classes="flex justify-between items-center"
+      [class.md:hidden]="user$ | async"
+    >
       <a href="/" class="text-lg font-black">echo</a>
       @if (!(user$ | async)) {
         <app-button label="Log in" size="sm" href="/log-in" />
