@@ -18,7 +18,7 @@ import { cn } from '../../utils/classname';
           [name]="name()"
           [id]="name()"
           [placeholder]="label()"
-          [class]="inputClasses"
+          [class]="getInputClasses()"
         ></textarea>
       } @else {
         <input
@@ -27,7 +27,7 @@ import { cn } from '../../utils/classname';
           [name]="name()"
           [id]="name()"
           [placeholder]="label()"
-          [class]="inputClasses"
+          [class]="getInputClasses()"
         />
       }
 
@@ -45,7 +45,7 @@ import { cn } from '../../utils/classname';
         {{ label() }}
       </label>
 
-      @if (error() && (control().dirty || control().touched)) {
+      @if (showError()) {
         <span class="text-sm text-warning-bright">{{ error() }}</span>
       }
     </div>
@@ -60,12 +60,19 @@ export class InputComponent {
   type = input<HTMLElementTagNameMap['input']['type']>('text');
 
   cn = cn;
-  inputClasses = cn(
-    'peer w-full px-4 py-2 bg-zinc-100 text-base text-zinc-800 outline-none rounded-lg border border-transparent placeholder:text-transparent',
-    'focus-visible:border-primary-bright',
-    this.textarea() && 'min-h-56 resize-none',
-    this.error() && 'border-warning-bright',
-  );
+
+  showError() {
+    return this.error() && (this.control().dirty || this.control().touched);
+  }
+
+  getInputClasses() {
+    return cn(
+      'peer w-full px-4 py-2 bg-zinc-100 text-base text-zinc-800 outline-none rounded-lg border border-transparent placeholder:text-transparent',
+      'focus-visible:border-primary-bright',
+      this.textarea() && 'min-h-56 resize-none',
+      this.showError() && 'border-warning-bright',
+    );
+  }
 }
 
 export const getValidationError = (
