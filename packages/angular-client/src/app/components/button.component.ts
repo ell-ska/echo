@@ -79,7 +79,7 @@ export class ButtonComponent {
   type = input<HTMLButtonElement['type']>();
 
   protected iconClass = computed(() =>
-    cn(this.size() === 'sm' && 'size-3', this.size() === 'md' && 'size-4'),
+    cn(this.size() === 'sm' && 'size-4', this.size() === 'md' && 'size-6'),
   );
 
   protected class = computed(() =>
