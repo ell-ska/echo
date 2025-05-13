@@ -11,17 +11,17 @@ import { ButtonComponent } from '../components/button.component';
   imports: [RouterOutlet, HeaderComponent, ButtonComponent],
   template: `
     <app-header classes="grid grid-cols-[20%_60%_20%] items-center">
-      @if (capsuleEditor.getStep() === 'content') {
+      @if (editor.getStep() === 'content') {
         <app-button [icon]="x" variant="tertiary" href="/" />
       } @else {
         <app-button
           [icon]="chevronLeft"
           variant="tertiary"
-          (onClick)="capsuleEditor.back()"
+          (onClick)="editor.back()"
         />
       }
       <h1 class="font-bold text-center truncate">
-        {{ capsuleEditor.title() }}
+        {{ editor.title() }}
       </h1>
     </app-header>
     <main class="main max-w-sm w-full">
@@ -33,9 +33,9 @@ export class CapsuleEditorLayoutComponent {
   x = X;
   chevronLeft = ChevronLeft;
 
-  capsuleEditor = inject(CapsuleEditorService);
+  editor = inject(CapsuleEditorService);
 
   ngOnInit() {
-    this.capsuleEditor.redirectToLastStep();
+    this.editor.redirectToLastSavedStep();
   }
 }
