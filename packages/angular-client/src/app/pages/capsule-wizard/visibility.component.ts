@@ -8,7 +8,7 @@ import { ButtonComponent } from '../../components/button.component';
   selector: 'app-visibility',
   imports: [ButtonComponent, ReactiveFormsModule],
   template: `
-    <form [formGroup]="editor.form">
+    <div>
       <h2 class="text-xl">
         Will
         <span class="font-bold">{{ editor.title() }}</span>
@@ -23,7 +23,7 @@ import { ButtonComponent } from '../../components/button.component';
         />
         <app-button label="Yes, let the world know!" (onClick)="setPublic()" />
       </nav>
-    </form>
+    </div>
   `,
 })
 export class VisibilityComponent {

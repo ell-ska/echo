@@ -46,7 +46,7 @@ import { cn } from '../../utils/classname';
           />
         }
 
-        @if (clearButton()) {
+        @if (clearButton() && control().value) {
           <app-button
             [icon]="x"
             variant="tertiary"

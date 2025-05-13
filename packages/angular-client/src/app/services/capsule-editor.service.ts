@@ -194,9 +194,13 @@ export class CapsuleEditorService {
     this.changeStep('back');
   }
 
-  redirectToLastStep() {
+  redirectToLastSavedStep() {
     const step = localStorage.getItem(stepKey);
     this.router.navigate(['/capsule/create', step]);
+  }
+
+  skipStep() {
+    this.changeStep('next');
   }
 
   protected ngOnDestroy() {

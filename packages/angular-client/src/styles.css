@@ -31,8 +31,7 @@
   app-create-account-page,
   app-log-in-page,
   app-explore-page,
-  app-capsule-page,
-  app-content {
+  app-capsule-page {
     @apply w-full grow flex flex-col items-center;
   }
 
