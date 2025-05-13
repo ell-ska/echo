@@ -12,14 +12,12 @@ import { ProfileComponent } from './profile.component';
       <span class="font-bold">{{ label() }}</span>
       <div class="flex gap-8 md:order-2">
         @for (profile of profiles(); track profile._id) {
-          <div class="flex gap-2 items-center">
-            <app-profile
-              [id]="profile._id"
-              [username]="profile.username"
-              [initials]="profile | initials"
-            />
-            <span>{{ '@' + profile.username }}</span>
-          </div>
+          <app-profile
+            [id]="profile._id"
+            [username]="profile.username"
+            [initials]="profile | initials"
+            [showUsername]="true"
+          />
         }
       </div>
     </div>

@@ -41,7 +41,7 @@ import { CapsuleOptionsComponent } from '../components/capsule-options.component
             />
           </div>
         } @else {
-          <article>
+          <article class="w-full md:flex-1">
             <header class="flex justify-between gap-4 mb-0.5">
               <h1 class="text-xl font-black">{{ capsule.title }}</h1>
               @if (capsule.state === 'opened') {
