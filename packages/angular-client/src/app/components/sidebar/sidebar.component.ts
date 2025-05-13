@@ -42,7 +42,7 @@ import { ButtonComponent } from '../button.component';
           [routerLink]="['/capsule/create']"
           class="flex items-center  gap-2 py-2 px-3 rounded-lg bg-transparent text-zinc-800 text-sm font-bold transition hover:bg-zinc-100"
         >
-          <app-button [icon]="plus" />
+          <app-button [icon]="plus" size="sm" />
           <span>Create</span>
         </a>
       </div>
