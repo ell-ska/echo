@@ -36,7 +36,7 @@ import { ImageComponent } from './image.component';
         <h3 class="text-xl font-black">{{ title() }}</h3>
         <div class="flex justify-between items-end">
           <div class="flex -space-x-3">
-            @for (sender of senders(); track id) {
+            @for (sender of senders(); track sender._id) {
               <app-profile
                 [id]="sender._id"
                 [username]="sender.username"
