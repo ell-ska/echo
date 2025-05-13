@@ -4,47 +4,72 @@ import {
   ReactiveFormsModule,
   type ValidationErrors,
 } from '@angular/forms';
+import { LucideAngularModule, X, type LucideIconData } from 'lucide-angular';
 
+import { ButtonComponent } from './button.component';
 import { cn } from '../../utils/classname';
 
 @Component({
   selector: 'app-input',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, LucideAngularModule, ButtonComponent],
   template: `
-    <div class="group relative flex flex-col gap-1">
-      @if (textarea()) {
-        <textarea
-          [formControl]="control()"
-          [name]="name()"
-          [id]="name()"
-          [placeholder]="label()"
-          [class]="getInputClasses()"
-        ></textarea>
-      } @else {
-        <input
-          [formControl]="control()"
-          [type]="type()"
-          [name]="name()"
-          [id]="name()"
-          [placeholder]="label()"
-          [class]="getInputClasses()"
-        />
-      }
-
-      <label
-        [for]="name()"
+    <div class="flex flex-col gap-1">
+      <div
         [class]="
           cn(
-            'absolute -top-3.5 left-2 cursor-text text-xs text-slate-500 transition-all',
-            'peer-focus-visible:text-primary-bright peer-focus-visible:-top-3.5 peer-focus-visible:left-2 peer-focus-visible:text-xs',
-            'peer-placeholder-shown:left-4 peer-placeholder-shown:top-2 peer-placeholder-shown:text-base',
-            error() && '-top-4 peer-focus-visible:-top-4'
+            'relative flex items-center gap-2 w-full px-4 py-2 bg-zinc-100 text-base text-zinc-800 outline-none rounded-lg border border-transparent',
+            'has-focus-visible:border-primary-bright',
+            showError() && 'border-warning-bright'
           )
         "
       >
-        {{ label() }}
-      </label>
+        @if (icon()) {
+          <lucide-icon [img]="icon()" class="size-4 text-zinc-600" />
+        }
 
+        @if (textarea()) {
+          <textarea
+            [formControl]="control()"
+            [name]="name()"
+            [id]="name()"
+            [placeholder]="label()"
+            class="peer w-full outline-0 min-h-56 resize-none placeholder:text-transparent"
+          ></textarea>
+        } @else {
+          <input
+            [formControl]="control()"
+            [type]="type()"
+            [name]="name()"
+            [id]="name()"
+            [placeholder]="label()"
+            class="peer w-full outline-0 placeholder:text-transparent"
+          />
+        }
+
+        @if (clearButton()) {
+          <app-button
+            [icon]="x"
+            variant="tertiary"
+            size="sm"
+            (onClick)="clear()"
+          />
+        }
+
+        <label
+          [for]="name()"
+          [class]="
+            cn(
+              'absolute -top-4 left-2 cursor-text text-xs text-slate-500 transition-all',
+              'peer-focus-visible:text-primary-bright peer-focus-visible:-top-4 peer-focus-visible:left-2 peer-focus-visible:text-xs',
+              'peer-placeholder-shown:left-4 peer-placeholder-shown:top-2 peer-placeholder-shown:text-base',
+              icon() && 'peer-placeholder-shown:left-10',
+              showError() && '-top-4 peer-focus-visible:-top-4'
+            )
+          "
+        >
+          {{ label() }}
+        </label>
+      </div>
       @if (showError()) {
         <span class="text-sm text-warning-bright">{{ error() }}</span>
       }
@@ -55,11 +80,19 @@ export class InputComponent {
   control = input.required<FormControl>();
   label = input.required<string>();
   name = input.required<string>();
+  icon = input<LucideIconData>();
   error = input<string | null>(null);
-  textarea = input(false);
   type = input<HTMLElementTagNameMap['input']['type']>('text');
+  textarea = input(false);
+  clearButton = input(false);
+
+  readonly x = X;
 
   cn = cn;
+
+  clear() {
+    this.control().reset();
+  }
 
   showError() {
     return this.error() && (this.control().dirty || this.control().touched);
