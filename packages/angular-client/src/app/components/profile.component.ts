@@ -7,11 +7,16 @@ import { cn } from '../../utils/classname';
 @Component({
   selector: 'app-profile',
   template: `
-    <app-image [src]="src()" [alt]="alt()" [classes]="getClasses('image')">
-      <div fallback [className]="getClasses('initials')">
-        {{ initials() }}
-      </div>
-    </app-image>
+    <div class="flex gap-2 items-center">
+      <app-image [src]="src()" [alt]="alt()" [classes]="getClasses('image')">
+        <div fallback [className]="getClasses('initials')">
+          {{ initials() }}
+        </div>
+      </app-image>
+      @if (showUsername()) {
+        <span class="truncate">{{ '@' + username() }}</span>
+      }
+    </div>
   `,
   imports: [ImageComponent],
 })
@@ -20,6 +25,7 @@ export class ProfileComponent {
   username = input.required<string>();
   size = input<'md' | 'lg'>('md');
   initials = input<string>();
+  showUsername = input(false);
 
   private imageService = inject(ImageService);
   protected src = signal<string | null>(null);
