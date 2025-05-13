@@ -43,6 +43,7 @@ userRouter.get('/me', userController.getCurrentUser)
 userRouter.get('/me/image', imageController.getCurrentUserImage)
 userRouter.put('/me', upload.single('image'), userController.editUser)
 userRouter.delete('/me', userController.deleteUser)
+userRouter.get('/autocomplete', userController.searchUserByUsername)
 userRouter.get('/:id', userController.getUserById)
 userRouter.get('/:id/image', imageController.getUserImageById)
 

@@ -48,6 +48,8 @@ const schema = new Schema(
   },
 )
 
+schema.index({ username: 1 })
+
 schema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next()

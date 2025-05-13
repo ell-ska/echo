@@ -45,6 +45,31 @@ export const userController = {
     },
     { authentication: 'required' },
   ),
+  searchUserByUsername: handle(
+    async ({ res, queryParams: { query } }) => {
+      const results = await User.find({
+        username: { $regex: `^${query}`, $options: 'i' },
+      }).limit(8)
+
+      res
+        .status(200)
+        .json(
+          results.map((user) => ({
+            _id: user._id,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+          })),
+        )
+    },
+    {
+      schemas: {
+        queryParams: z.object({
+          query: z.string(),
+        }),
+      },
+    },
+  ),
   editUser: handle(
     async ({
       res,
