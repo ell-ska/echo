@@ -407,7 +407,13 @@ curl --request PUT \
 
 #### response example
 
-_204: No Content_
+_201: Success_
+
+```json
+{
+  "id": "67e66689177ae5782d84cfb0"
+}
+```
 
 #### possible errors
 

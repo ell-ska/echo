@@ -12,6 +12,7 @@ import { isFuture } from 'date-fns';
 import type { CapsuleValues } from '@repo/validation/actions';
 import type { UserData } from '@repo/validation/data';
 import { CapsuleService } from './capsule.service';
+import { ToastService } from './toast.service';
 import { getValidationError } from '../components/input.component';
 
 const storageKey = 'capsule-editor-draft';
@@ -85,6 +86,7 @@ export class CapsuleEditorService {
   });
 
   private capsuleService = inject(CapsuleService);
+  private toast = inject(ToastService);
   private router = inject(Router);
 
   private formSubscription!: Subscription;
@@ -177,6 +179,16 @@ export class CapsuleEditorService {
     this.form.reset();
   }
 
+  getMode() {
+    const match = this.router.url.match(/(create|edit)/);
+    return match?.[1];
+  }
+
+  getId() {
+    const match = this.router.url.match(/\b[a-fA-F0-9]{24}\b/);
+    return match?.[0];
+  }
+
   getStep() {
     const segments = this.router.url.split('/');
     return segments[segments.length - 1] as Step;
@@ -201,7 +213,7 @@ export class CapsuleEditorService {
     if (!step) return;
 
     localStorage.setItem(stepKey, step);
-    this.router.navigate(['/capsule/create', step]);
+    this.navigate(step);
   }
 
   next() {
@@ -216,34 +228,43 @@ export class CapsuleEditorService {
 
   redirectToLastSavedStep() {
     const step = localStorage.getItem(stepKey);
+    this.navigate(step);
+  }
 
-    if (!step) {
-      this.router.navigate(['/capsule/create']);
-      return;
-    }
+  navigate(step: string | null) {
+    const mode = this.getMode();
+    const id = this.getId();
 
-    this.router.navigate(['/capsule/create', step]);
+    const segments = ['/capsule'];
+
+    if (id) segments.push(id);
+    if (mode) segments.push(mode);
+    if (step) segments.push(step);
+
+    this.router.navigate(segments);
   }
 
   skipStep() {
     this.changeStep('next');
   }
 
-  save(mode: string) {
+  save() {
+    const mode = this.getMode();
+
     if (this.form.valid) {
       if (mode === 'create') {
         this.create();
       } else if (mode === 'edit') {
-        // edit
+        this.edit();
       }
     } else {
       this.form.markAllAsTouched();
     }
   }
 
-  create() {
+  private getFormValues() {
     const form = this.form.value;
-    const values = {
+    return {
       title: form.title!,
       visibility: form.visibility as CapsuleValues['visibility'],
       receivers: form.receivers?.map((user) => user._id),
@@ -252,14 +273,37 @@ export class CapsuleEditorService {
       content: form.content || undefined,
       images: this.images() || undefined,
     };
+  }
 
-    this.capsuleService.create(values).subscribe({
+  private create() {
+    const values = this.getFormValues();
+    this.capsuleService.create({ values }).subscribe({
       next: ({ id }) => {
         this.clear();
         this.router.navigate(['/capsule', id]);
       },
       error: (error) => {
-        console.log(error);
+        this.toast.error(error);
+      },
+    });
+  }
+
+  private edit() {
+    const id = this.getId();
+    if (!id) {
+      this.toast.error({ message: 'Cannot find the id for the capsule' });
+      return;
+    }
+
+    const values = this.getFormValues();
+
+    this.capsuleService.edit({ id, values }).subscribe({
+      next: ({ id }) => {
+        this.clear();
+        this.router.navigate(['/capsule', id]);
+      },
+      error: (error) => {
+        this.toast.error(error);
       },
     });
   }

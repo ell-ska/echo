@@ -5,6 +5,10 @@ import type { CapsuleData } from '@repo/validation/data';
 import type { CapsuleValues } from '@repo/validation/actions';
 import { createFormData } from '../../utils/create-form-data';
 
+export type Values = Omit<CapsuleValues, 'openDate'> & {
+  openDate: Date | undefined;
+};
+
 @Injectable({
   providedIn: 'root',
 })
@@ -23,10 +27,15 @@ export class CapsuleService {
     return this.http.get<CapsuleData>(`/capsules/${id}`);
   }
 
-  create(
-    values: Omit<CapsuleValues, 'openDate'> & { openDate: Date | undefined },
-  ) {
+  create({ values }: { values: Values }) {
     return this.http.post<{ id: string }>('/capsules', createFormData(values));
+  }
+
+  edit({ id, values }: { id: string; values: Values }) {
+    return this.http.put<{ id: string }>(
+      `/capsules/${id}`,
+      createFormData(values),
+    );
   }
 
   delete({ id }: { id: string }) {
