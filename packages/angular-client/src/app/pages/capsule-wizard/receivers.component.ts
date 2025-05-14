@@ -104,7 +104,9 @@ export class ReceiversComponent {
 
   control = new FormControl('');
   results$: Observable<UserData[]> = of([]);
-  receivers = signal<UserData[]>(this.editor.form.controls.receivers.value);
+  receivers = signal<UserData[]>(
+    this.editor.form.controls.receivers.value || [],
+  );
   receiverIds = computed(() =>
     this.receivers().map((receiver) => receiver._id),
   );

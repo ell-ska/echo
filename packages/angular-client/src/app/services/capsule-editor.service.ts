@@ -9,6 +9,9 @@ import {
 } from 'rxjs';
 import { isFuture } from 'date-fns';
 
+import type { CapsuleValues } from '@repo/validation/actions';
+import type { UserData } from '@repo/validation/data';
+import { CapsuleService } from './capsule.service';
 import { getValidationError } from '../components/input.component';
 
 const storageKey = 'capsule-editor-draft';
@@ -58,16 +61,30 @@ export class CapsuleEditorService {
         return values.includes(control.value) ? null : { invalid: true };
       },
     ]),
-    receivers: new FormControl(),
+    receivers: new FormControl<UserData[]>([]),
     openDate: new FormControl(null, [
       (control) => {
-        const date = new Date(control.value);
-        return isFuture(date) ? null : { past: true };
+        const value = control.value;
+        const parent = control.parent;
+        const type = parent?.get('type')?.value;
+
+        if (type === 'seal') {
+          if (!value) {
+            return { required: true };
+          }
+
+          const date = new Date(value);
+          return isFuture(date) ? null : { past: true };
+        }
+
+        return null;
       },
     ]),
     showCountdown: new FormControl(false),
+    type: new FormControl('seal'),
   });
 
+  private capsuleService = inject(CapsuleService);
   private router = inject(Router);
 
   private formSubscription!: Subscription;
@@ -144,15 +161,18 @@ export class CapsuleEditorService {
         });
       case 'openDate':
         return getValidationError(this.form.controls.openDate.errors, {
+          required: 'You have to set an open date to seal the capsule',
           past: 'Open date has to be in the future',
         });
       case 'receivers':
       case 'showCountdown':
+      case 'type':
         return null;
     }
   }
 
   clear() {
+    localStorage.removeItem(stepKey);
     localStorage.removeItem(storageKey);
     this.form.reset();
   }
@@ -196,11 +216,52 @@ export class CapsuleEditorService {
 
   redirectToLastSavedStep() {
     const step = localStorage.getItem(stepKey);
+
+    if (!step) {
+      this.router.navigate(['/capsule/create']);
+      return;
+    }
+
     this.router.navigate(['/capsule/create', step]);
   }
 
   skipStep() {
     this.changeStep('next');
+  }
+
+  save(mode: string) {
+    if (this.form.valid) {
+      if (mode === 'create') {
+        this.create();
+      } else if (mode === 'edit') {
+        // edit
+      }
+    } else {
+      this.form.markAllAsTouched();
+    }
+  }
+
+  create() {
+    const form = this.form.value;
+    const values = {
+      title: form.title!,
+      visibility: form.visibility as CapsuleValues['visibility'],
+      receivers: form.receivers?.map((user) => user._id),
+      openDate: form.openDate ? new Date(form.openDate) : undefined,
+      showCountdown: form.showCountdown!,
+      content: form.content || undefined,
+      images: this.images() || undefined,
+    };
+
+    this.capsuleService.create(values).subscribe({
+      next: ({ id }) => {
+        this.clear();
+        this.router.navigate(['/capsule', id]);
+      },
+      error: (error) => {
+        console.log(error);
+      },
+    });
   }
 
   protected ngOnDestroy() {

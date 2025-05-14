@@ -149,6 +149,8 @@ const getCapsules = async ({
   ])
 }
 
+const populateUser = 'image username firstName lastName'
+
 export const capsuleController = {
   createCapsule: handle(
     async ({ res, values: { collaborators, ...rest }, userId }) => {
@@ -246,10 +248,9 @@ export const capsuleController = {
   ),
   getCapsuleById: handle(
     async ({ res, params: { id }, userId }) => {
-      const capsule = await Capsule.findById(id).populate(
-        'senders',
-        'image username firstName lastName',
-      )
+      const capsule = await Capsule.findById(id)
+        .populate('senders', populateUser)
+        .populate('receivers', populateUser)
 
       if (!capsule) {
         throw new NotFoundError('capsule not found')
