@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+import { authGuard } from './guards/auth.guard';
 import { ExplorePageComponent } from './pages/explore.component';
 import { SentPageComponent } from './pages/sent.component';
 import { ReceivedPageComponent } from './pages/received.component';
@@ -31,8 +32,12 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     children: [
       { path: '', component: ExplorePageComponent },
-      { path: 'sent', component: SentPageComponent },
-      { path: 'received', component: ReceivedPageComponent },
+      { path: 'sent', component: SentPageComponent, canActivate: [authGuard] },
+      {
+        path: 'received',
+        component: ReceivedPageComponent,
+        canActivate: [authGuard],
+      },
     ],
   },
   {
@@ -48,14 +53,23 @@ export const routes: Routes = [
         children: wizardRoutes,
       },
     ],
+    canActivate: [authGuard],
   },
   {
     path: '',
     component: MainLayoutComponent,
     children: [
       { path: 'capsule/:id', component: CapsulePageComponent },
-      { path: 'profile', component: ProfilePageComponent },
-      { path: 'profile/edit', component: EditProfilePageComponent },
+      {
+        path: 'profile',
+        component: ProfilePageComponent,
+        canActivate: [authGuard],
+      },
+      {
+        path: 'profile/edit',
+        component: EditProfilePageComponent,
+        canActivate: [authGuard],
+      },
     ],
   },
   {
