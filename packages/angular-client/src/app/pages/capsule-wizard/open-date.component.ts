@@ -51,8 +51,6 @@ export class OpenDateComponent {
   editor = inject(CapsuleEditorService);
   route = inject(ActivatedRoute);
 
-  mode = computed(() => this.route.parent?.snapshot.url[1].path!);
-
   setShowCountdown(value: boolean) {
     this.editor.form.controls.showCountdown.setValue(value);
   }
@@ -60,11 +58,11 @@ export class OpenDateComponent {
   draft() {
     this.editor.form.controls.type.setValue('draft');
     this.editor.form.controls.openDate.setValue(null);
-    this.editor.save(this.mode());
+    this.editor.save();
   }
 
   seal() {
     this.editor.form.controls.type.setValue('seal');
-    this.editor.save(this.mode());
+    this.editor.save();
   }
 }

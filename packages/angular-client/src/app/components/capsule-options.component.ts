@@ -24,7 +24,7 @@ import { ButtonComponent } from './button.component';
         @if (state() === 'unsealed') {
           <app-button
             label="Edit"
-            [routerLink]="['/capsule', id(), '/edit']"
+            [routerLink]="['/capsule', id(), 'edit']"
             size="sm"
           />
         }

@@ -207,7 +207,7 @@ export const capsuleController = {
       )
 
       await capsule.save()
-      res.status(204).send()
+      res.status(200).json({ id: capsule._id })
     },
     {
       authentication: 'required',
