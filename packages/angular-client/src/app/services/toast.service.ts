@@ -46,8 +46,6 @@ export class ToastService {
       this.close(toast.id);
     }, this.duration);
   }
-
-  constructor() {}
 }
 
 export type Toast = {
