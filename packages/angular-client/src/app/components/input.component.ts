@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, ElementRef, input, ViewChild } from '@angular/core';
 import {
   FormControl,
   ReactiveFormsModule,
@@ -23,7 +23,14 @@ import { cn } from '../../utils/classname';
           )
         "
       >
-        @if (icon()) {
+        @if ((type() === 'date' || type() === 'datetime-local') && icon()) {
+          <app-button
+            [icon]="icon()"
+            variant="tertiary"
+            size="sm"
+            (onClick)="triggerDatePicker()"
+          />
+        } @else if (icon()) {
           <lucide-icon [img]="icon()" class="size-4 text-zinc-600" />
         }
 
@@ -37,12 +44,13 @@ import { cn } from '../../utils/classname';
           ></textarea>
         } @else {
           <input
+            #input
             [formControl]="control()"
             [type]="type()"
             [name]="name()"
             [id]="name()"
             [placeholder]="label()"
-            class="peer w-full outline-0 placeholder:text-transparent"
+            class="hide-calendar-picker-indicator peer w-full outline-0 placeholder:text-transparent"
           />
         }
 
@@ -88,7 +96,13 @@ export class InputComponent {
 
   readonly x = X;
 
+  @ViewChild('input') inputRef!: ElementRef<HTMLInputElement>;
+
   cn = cn;
+
+  triggerDatePicker() {
+    this.inputRef.nativeElement.showPicker();
+  }
 
   clear() {
     this.control().reset();
@@ -96,15 +110,6 @@ export class InputComponent {
 
   showError() {
     return this.error() && (this.control().dirty || this.control().touched);
-  }
-
-  getInputClasses() {
-    return cn(
-      'peer w-full px-4 py-2 bg-zinc-100 text-base text-zinc-800 outline-none rounded-lg border border-transparent placeholder:text-transparent',
-      'focus-visible:border-primary-bright',
-      this.textarea() && 'min-h-56 resize-none',
-      this.showError() && 'border-warning-bright',
-    );
   }
 }
 
