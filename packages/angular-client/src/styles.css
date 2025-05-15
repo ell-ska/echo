@@ -36,7 +36,8 @@
     @apply w-full grow flex flex-col items-center;
   }
 
-  app-capsule-page {
+  app-capsule-page,
+  app-explore-page {
     @apply min-h-screen;
   }
 
