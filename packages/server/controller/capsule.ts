@@ -129,7 +129,7 @@ const getCapsules = async ({
     {
       $sort: {
         hasOpenDate: -1, // prioritize capsules with an open date
-        openDateDiff: 1,
+        openDateDiff: -1,
         sealedAt: -1,
         createdAt: -1,
       },
